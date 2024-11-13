@@ -1,0 +1,16 @@
+# prog
+node_modules
+.vscode
+__pycache__
+*.log
+
+# privacy
+sessdata.json
+
+# fetched
+data_*
+public/bili
+public/hbr
+
+# built
+dist

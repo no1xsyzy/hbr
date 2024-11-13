@@ -1,0 +1,305 @@
+"当前国服置顶" = [
+  'scoreAttack28',
+  # 'Hard_MC01_12_Battle03',
+  # 'Hard_MC01_12_Battle03_2nd',
+  # 'Hard_MC02ExpSpecialPatrol01_BOSS02_01',
+  # 'Hard_MC02ExpSpecialPatrol01_BOSS02_02',
+  'Hard_MC02_25_RedCrimson',
+  # 'Hard_MC03_14_Feeler',
+  # 'Hard_MC03_21_FlatHand1st',
+  # 'Hard_MC03_21_FlatHand2nd',
+  # 'Hard_MC03_21_FlatHand3rd',
+  # 'Hard_MC04_06_UltimateFeeler',
+  # 'Hard_MC04_12_UltimateHand3rd',
+]
+
+["国服高分"]
+scoreAttack18 = "1"
+scoreAttack19 = "2"
+scoreAttack20 = "3"
+scoreAttack15 = "4"
+scoreAttack22 = "5"
+scoreAttack21 = "6"
+scoreAttack26 = "7"
+scoreAttack24 = "8"
+scoreAttack28 = "9"
+scoreAttack30 = "10"
+
+[ACNames]
+1 = '温柔、悲恸与坚强'
+2 = 'Requiem for the Blue'
+3 = '秒棋一手 织此星辰'
+4 = '行动观察报告书 第1186号'
+5 = '冲呀！小个子大作战 U140'
+6 = 'A Little Tear, Forgotten Memories 小小泪滴与逝去的记忆'
+7 = '夏日！泳装！热带庆典来啦！'
+8 = 'Dear My Little HERO'
+9 = '神谕与白色百合花'
+10 = '主线故事 断章Ⅰ 遠い海の色'
+11 = "That day's Friend"
+12 = '炽天使刀剑武术会'
+13 = '新春！31A无人岛荒野求生记～时而会Game Over～'
+14 = '大岛屋物语'
+15 = '慕君之意望君觉'
+16 = '如梦而逝的崇高者们'
+17 = '罪、罚与爱'
+18 = 'Peace of Cradle'
+# 19 = "きみはこの夏のFairy、ぼくはその姿を瞳の奥にRec."
+# 20 = "小さき帝と穏やかな朝食"
+# 21 = "美人温泉物語~湯けむり千紫万紅~"
+# 22 = "緋に染まる袖時雨"
+# 23 = "Letters on The Back"
+# 24 = "主线故事 断章Ⅱ 死にゆく季節でぼくらは"
+# 25 = "私立セラフィム学園 ~蒼井、アイドルになります！~"
+# 26 = "怪人ノートと銀の時計"
+# 27 = "28メートルの永遠"
+# 28 = "アイリーン・レドメインの事件簿 －名探偵と森の魔女－"
+# 29 = "Silhouette of Summer Light Square"
+# 30 = "水着を制するものは夏を制すin習志野"
+# 31 = "BAD GIRLS DESTRUCTION"
+
+[CCNames]
+1 = '波斯菊常开的地方'
+# 2 = 'Beautiful the Blood'
+
+[BattleNames]
+Hard_MC01_12_Battle03 = '异时层 死亡蛞蝓 一阶段'
+Hard_MC01_12_Battle03_2nd = '异时层 死亡蛞蝓 二阶段'
+Hard_MC02ExpSpecialPatrol01_BOSS02_01 = '异时层 畸旋钻 一阶段'
+Hard_MC02ExpSpecialPatrol01_BOSS02_02 = '异时层 畸旋钻 二阶段'
+Hard_MC02_25_RedCrimson = '异时层 猩红之主'
+Hard_MC03_14_Feeler = '异时层 感应触须'
+Hard_MC03_21_FlatHand1st = '异时层 覆地之手 一阶段'
+Hard_MC03_21_FlatHand2nd = '异时层 覆地之手 二阶段'
+Hard_MC03_21_FlatHand3rd = '异时层 覆地之手 三阶段'
+Hard_MC04_06_UltimateFeeler = '异时层 终极触须'
+Hard_MC04_12_UltimateHand3rd = '异时层 四章上 覆地之手 三阶段'
+# Hard_MC04B_07_DesertDendron = '异时层 沙虫'
+Hard_Renewal_MC01_12_Battle03 = '新版异时层 死亡蛞蝓 一阶段'
+Hard_Renewal_MC01_12_Battle03_2nd = '新版异时层 死亡蛞蝓 二阶段'
+Hard_Renewal_MC02ExpSpecialPatrol01_BOSS02_01 = '新版异时层 畸旋钻 一阶段'
+Hard_Renewal_MC02ExpSpecialPatrol01_BOSS02_02 = '新版异时层 畸旋钻 二阶段'
+Hard_Renewal_MC02_25_RedCrimson = '新版异时层 猩红之主'
+Hard_Renewal_MC03_14_Feeler = '新版异时层 感应触须'
+Hard_Renewal_MC03_21_FlatHand1st = '新版异时层 覆地之手 一阶段'
+Hard_Renewal_MC03_21_FlatHand2nd = '新版异时层 覆地之手 二阶段'
+Hard_Renewal_MC04_06_UltimateFeeler = '新版异时层 终极触须'
+Hard_Renewal_MC04_12_UltimateHand3rd = '新版异时层 四章上 覆地之手 三阶段'
+# Hard_Renewal_MC04B_07_DesertDendron = '新版异时层 沙虫'
+# Hard_MC04B_14_SkullFeatherHead = '异时层 SkullFeatherHead'
+# Hard_MC04B_14_SkullFeatherTail = '异时层 SkullFeatherTail'
+
+
+["B服实装"]
+'2024-07-17 11:00:00+08:00' = [
+  'ADate01',
+  'AKanzaki01',
+  'AMizuhara01',
+  'BIYamawaki01',
+  'BIYamawaki02',
+  'Byakko01',
+  'Byakko03',
+  'CMatsuoka01',
+  'CReaper01',
+  'CSkopovskaya01',
+  'CSugahara01',
+  'CSugahara03',
+  'EAoi01',
+  'EAoi02',
+  'FMikoto01',
+  'HOgasawara01',
+  'IIshii01',
+  'IIshii02',
+  'IMinase01',
+  'INatsume01',
+  'IRedmayne01',
+  'IRedmayne02',
+  'IcOhshima01',
+  'IrOhshima01',
+  'KAsakura01',
+  'KAsakura03',
+  'KHiiragi01',
+  'KMaruyama01',
+  'LShanhua01',
+  'LShanhua02',
+  'MAikawa01',
+  'MAikawa02',
+  'MAikawa03',
+  'MKiryu01',
+  'MKurosawa01',
+  'MNikaido01',
+  'MSatsuki01',
+  'MTenne01',
+  'MTenne03',
+  'MTsukishiro01',
+  'MYanagi01',
+  'MYanagi02',
+  'MdAngelis01',
+  'MiOhshima01',
+  'MiOhshima02',
+  'MuOhshima01',
+  'NiOhshima01',
+  'NiOhshima02',
+  'RKayamori01',
+  'RKayamori02',
+  'RKayamori03',
+  'RKayamori04',
+  'RMurohushi01',
+  'RMurohushi02',
+  'SHanamura01',
+  'SHanamura02',
+  'SHiguchi01',
+  'SHiguchi03',
+  'SKura01',
+  'SKura02',
+  'SMinase01',
+  'SMinase02',
+  'SSakuraba01',
+  'SSakuraba03',
+  'TKunimi01',
+  'TKunimi02',
+  'TKunimi03',
+  'TTojo01',
+  'TTojo03',
+  'VBalakrishnan01',
+  'YBungo01',
+  'YBungo02',
+  'YBungo03',
+  'YIzumi01',
+  'YIzumi03',
+  'YShirakawa01',
+  'YShirakawa02',
+  'YoOhshima01',
+  'AKanzaki02',
+  'MSatsuki03',
+  'TTojo02',
+  'BIYamawaki03',
+  'HOgasawara02',
+  'CSkopovskaya02',
+  'MAikawa05',
+  'MTsukishiro03',
+  'IMinase03',
+  'KHiiragi02',
+  'SMinase03',
+  'KAsakura02',
+  'TKunimi05',
+  'ADate02',
+  'MNikaido03',
+  'MuOhshima02',
+  'INatsume02',
+  'YShirakawa03',
+  'MKiryu02',
+  'MTsukishiro02',
+  'RKayamori05',
+  'SKura03',
+  'HOgasawara03',
+  'YIzumi02',
+  'KMaruyama03',
+  'MKurosawa02',
+  'MYanagi03',
+  'KAsakura04',
+  'KHiiragi03',
+  'SSakuraba02',
+  'AKanzaki03',
+  'CSugahara02',
+  'IcOhshima03',
+  'YoOhshima02',
+  'IrOhshima03',
+  'MNikaido02',
+  'EAoi03',
+  'TKunimi04',
+  'YIzumi04',
+  'RKayamori06',
+  'SMinase04',
+  'TTojo04',
+  'CReaper03',
+  'IRedmayne03',
+  'VBalakrishnan02',
+  'CMatsuoka03',
+  'SHanamura03',
+  'SHiguchi02',
+  'MKiryu03',
+  'SKura04',
+  'YShirakawa04',
+  'AMizuhara02',
+  'IIshii03',
+  'RMurohushi03',
+  'Byakko02',
+  'KHiiragi04',
+  'SHiguchi04',
+  'IrOhshima02',
+  'MiOhshima03',
+  'NiOhshima03',
+  'INatsume03',
+  'KMaruyama02',
+  'MKurosawa03',
+  'BIYamawaki04',
+  'MTenne02',
+  'YBungo04',
+  'AliceA03',
+  'AliceB03',
+  'AliceC02',
+]
+'2024-07-31 11:00:00+08:00' = ['RKayamori07', 'YIzumi05']
+'2024-08-14 13:00:00+08:00' = ['YoOhshima03', 'MuOhshima03', 'NiOhshima04']
+'2024-08-28 13:00:00+08:00' = ['LShanhua03', 'MdAngelis03', 'CReaper02', 'TKunimi06', 'SSakuraba04', 'MSatsuki02']
+'2024-09-11 13:00:00+08:00' = ['BIYamawaki05', 'AKanzaki04', 'MSatsuki04']
+'2024-09-25 10:00:00+08:00' = ['CSugahara04', 'FMikoto03', 'IcOhshima02']
+'2024-10-09 13:00:00+08:00' = [
+  'MAikawa06',
+  'YShirakawa05',
+  'SKura05',
+  'IMinase02',
+  'VBalakrishnan03',
+  'MdAngelis02',
+  'CSkopovskaya03',
+]
+'2024-10-23 13:00:00+08:00' = ['EAoi04', 'Byakko04']
+'2024-11-06 13:00:00+08:00' = [
+  'RMurohushi05',
+  'MTenne04',
+  'HOgasawara04',
+  'AMizuhara03',
+  'ADate03',
+  'RMurohushi04',
+  'IIshii04',
+  'FMikoto02',
+]
+# :: 具体时间未确定 ::
+'2024-11-20 13:00:00+08:00' = ['IcOhshima04', 'MSatsuki05']
+# :: 乱序未实装 ::
+# :: 手册中可偷看 ::
+# 'TKunimi07', 'YIzumi06', 'YShirakawa06',
+# 'KAsakura05', 'TTojo05',
+# :: 手册中不可偷看 ::
+# 'KMaruyama04', 'INatsume04',
+# 'MKiryu04', 'MYanagi04', 'CMatsuoka02',
+# 'YIzumi07', 'KAsakura06',
+# 'NiOhshima05', 'IrOhshima04', 'MuOhshima04',
+# 'AKanzaki05', 'LShanhua04', 'VBalakrishnan04',
+# 'MTsukishiro04', 'CSugahara05', 'HOgasawara05',
+# 'MdAngelis04', 'CSkopovskaya04',
+# 'MNikaido04', 'ADate04', 'AMizuhara04',
+# 'MAikawa07', 'TKunimi08',
+# 'EAoi05', 'IMinase04', 'SHiguchi05',
+# 'YoOhshima04', 'MuOhshima05',
+# 'AliceC03',
+# 'AliceA04', 'AliceB04', 'BiancaA02',
+# 'YIzumi08', 'BIYamawaki06',
+# 'RKayamori08',
+# 'SSakuraba05', 'MTenne05', 'YBungo05',
+# 'SMinase05', 'KHiiragi05',
+# 'TTojo06', 'LShanhua05',
+# 'MKiryu05', 'CSugahara06', 'HOgasawara06',
+# 'MNikaido05', 'AMizuhara05', 'KMaruyama05',
+# 'CReaper04', 'IRedmayne04', 'VBalakrishnan05',
+# 'SSakuraba06', 'CSkopovskaya05',
+# 'YShirakawa07',
+# 'TKunimi09', 'AKanzaki06', 'MSatsuki06',
+# 'MAikawa08', 'TTojo07', 'KAsakura07',
+# 'MYanagi05', 'CMatsuoka04', 'MKurosawa04',
+# 'HOgasawara07', 'INatsume05',
+# 'IcOhshima05', 'MiOhshima04', 'IrOhshima05',
+# 'CReaper05', 'CSkopovskaya06',
+# 'YIzumi09',
+# 'EAoi06', 'IMinase05', 'SMinase06',
