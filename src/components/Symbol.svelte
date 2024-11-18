@@ -1,9 +1,13 @@
-<script>
-  export let symbol
-  export let size = '1em'
-  export let forceNeoSymbol = false
-  $: neoSymbol = forceNeoSymbol || ['光', '冰', '打', '斩', '无', '暗', '火', '突', '雷'].includes(symbol)
-  $: useSymbol = ['A', 'S', 'SS', '光', '冰', '打', '斩', '无', '暗', '火', '突', '雷'].includes(symbol)
+<script lang="ts">
+  interface Props {
+    symbol: any
+    size?: string
+    forceNeoSymbol?: boolean
+  }
+
+  let { symbol, size = '1em', forceNeoSymbol = false }: Props = $props()
+  let neoSymbol = $derived(forceNeoSymbol || ['光', '冰', '打', '斩', '无', '暗', '火', '突', '雷'].includes(symbol))
+  let useSymbol = $derived(['A', 'S', 'SS', '光', '冰', '打', '斩', '无', '暗', '火', '突', '雷'].includes(symbol))
 </script>
 
 {#if symbol === null}

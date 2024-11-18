@@ -32,17 +32,17 @@
     "vite-plugin-toml": "^0.7.0"
   },
   "dependencies": {
-    "@sveltejs/vite-plugin-svelte": "^3.1.1",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@tsconfig/svelte": "^5.0.4",
     "axios": "^1.7.7",
     "echarts": "^5.5.1",
     "jsonschema": "^1.4.1",
     "least-squares": "^0.0.2",
     "sql.js": "^1.12.0",
-    "svelte": "^4.2.18",
+    "svelte": "^5.0.0",
     "tau-prolog": "^0.3.4",
     "tslib": "^2.7.0",
     "typescript": "^5.6.3",
-    "vite": "^5.4.1"
+    "vite": "^5.4.4"
   }
 }

@@ -8,83 +8,84 @@
   import Prolog from './Prolog.svelte'
   import EstimateBAcc from './EstimateBAcc.svelte'
 
-  let pages = []
-  let currentPageIndex = -1
+  let pages = $state([])
+  let currentPageKey = $state(null)
   let pageCount = 0
 
-  $: console.log('pages', pages)
-
   function makePage(name, type = 'nuke') {
+    const key = Math.trunc(Math.random() * 1e8)
     return {
       name,
       type,
-      storeKey: 'PAGE_' + Math.trunc(Math.random() * 1e8),
+      key,
+      storeKey: 'PAGE_' + key,
     }
   }
 
   function addPage(type = 'nuke') {
     pageCount += 1
-    pages = [...pages, makePage('标签' + pageCount, type)]
-    if (currentPageIndex === -1) currentPageIndex = 0
+    const newPage = makePage('标签' + pageCount, type)
+    pages = [...pages, newPage]
+    currentPageKey = newPage.key
   }
-
-  const trace = (remark) => (data) => (console.log(remark, data), data)
 </script>
 
 <nav>
   {#each pages as page, i}
-    <button
-      on:click={(e) => {
-        currentPageIndex = i
-      }}
-      class="simsel"
-      class:current={currentPageIndex == i}
-    >
-      <span>{page.name}</span>
-      <button
+    {@const current = currentPageKey === page.key}
+    <div class="simsel" class:current>
+      <button class="sel" onclick={(e) => (currentPageKey = page.key)}>{page.name}</button><button
         class="del"
-        on:click={(e) => {
+        onclick={(e) => {
           pages.splice(i, 1)
-          pages = pages
+          if (current) {
+            if (pages.length === 0) currentPageKey = null
+            else if (pages.length === i) currentPageKey = pages.at(-1).key
+            else currentPageKey = pages[i].key
+          }
         }}>x</button
       >
-    </button>
+    </div>
   {/each}
-  <button class="adds" on:click={(e) => addPage('nuke')}>+计算一发核弹</button>
-  <button class="adds" on:click={(e) => addPage('odsp')}>+计算OD和SP</button>
-  <button class="adds" on:click={(e) => addPage('prolog')}>+超级查询</button>
-  <button class="adds" on:click={(e) => addPage('esacc_bili')}>+预测B服实装速度</button>
+  <!-- <div class="padding"></div> -->
+  <div class="adders">
+    <button class="adds" onclick={(e) => addPage('nuke')}>+计算一发核弹</button>
+    <button class="adds" onclick={(e) => addPage('odsp')}>+计算OD和SP</button>
+    <button class="adds" onclick={(e) => addPage('prolog')}>+超级查询</button>
+    <button class="adds" onclick={(e) => addPage('esacc_bili')}>+预测B服实装速度</button>
+  </div>
 </nav>
 
-{#each pages as page, i (page.storeKey)}
+{#each pages as page, i (page.key)}
+  {@const active = currentPageKey === page.key}
+  {@const setname = (name) => (page.name = name)}
   {#if page.type == 'nuke'}
-    <main class:active={i === currentPageIndex}>
-      <SimNuke storeKey={page.storeKey} active={i === currentPageIndex} />
+    <main class:active>
+      <SimNuke storeKey={page.storeKey} {active} {setname} />
     </main>
   {:else if page.type == 'odsp'}
-    <main class:active={i === currentPageIndex}>
-      <SimODSP storeKey={page.storeKey} active={i === currentPageIndex} />
+    <main class:active>
+      <SimODSP storeKey={page.storeKey} {active} {setname} />
     </main>
   {:else if page.type == 'prolog'}
-    <main class:active={i === currentPageIndex}>
-      <Prolog storeKey={page.storeKey} active={i === currentPageIndex} />
+    <main class:active>
+      <Prolog storeKey={page.storeKey} {active} {setname} />
     </main>
   {:else if page.type == 'esacc_bili'}
-    <main class:active={i === currentPageIndex}>
-      <EstimateBAcc storeKey={page.storeKey} active={i === currentPageIndex} />
+    <main class:active>
+      <EstimateBAcc storeKey={page.storeKey} {active} {setname} />
     </main>
   {:else}
-    <main class:active={i === currentPageIndex}>
-      <div class="unknown">未知的页面类型 ({pages[currentPageIndex].type})，请刷新或删除本页面</div>
+    <main class:active>
+      <div class="unknown">未知的页面类型 ({page.type})，请刷新或删除本页面</div>
     </main>
   {/if}
 {/each}
-<main class:active={currentPageIndex === -1 || !pages[currentPageIndex]}>
+<main class:active={currentPageKey === null}>
   <div class="idle">少女祈祷中……</div>
 </main>
 
 <style>
-  nav,
   main {
     width: 100%;
     max-width: 1280px;
@@ -102,28 +103,41 @@
     display: inherit;
   }
   nav {
+    width: 100%;
+    padding: 0 calc((100vw - 1280px) / 2);
     background-color: grey;
-    height: 40px;
-    line-height: 40px;
-  }
-  nav .simsel {
-    background-color: grey;
-    border: none;
-    height: 40px;
-    margin: 0 5px;
-    padding-left: 20px;
-    &:hover {
-      background-color: lightgrey;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    & .adders {
+      margin-left: auto;
+    }
+    & .simsel {
+      background-color: grey;
+      border: none;
+      height: 40px;
+      white-space: collapse balance;
+      &:hover {
+        background-color: lightgrey;
+      }
+      & button {
+        height: 100%;
+        background-color: transparent;
+        border: none;
+        &.sel {
+          padding: 0 10px;
+        }
+        &.del:hover {
+          color: red;
+        }
+      }
+      &.current {
+        background-color: white;
+      }
     }
   }
-  nav .del {
-    background-color: transparent;
-    border: none;
-  }
-  nav .del:hover {
-    color: red;
-  }
-  nav .simsel.current {
-    background-color: white;
+
+  nav .adds {
+    height: 40px;
   }
 </style>

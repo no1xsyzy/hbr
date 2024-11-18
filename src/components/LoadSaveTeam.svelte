@@ -1,18 +1,19 @@
-<script>
-  import { createEventDispatcher } from 'svelte'
+<script lang="ts">
   // import { LocalStorage } from '../lib/store.ts';
 
-  export let team = [null, null, null, null, null, null]
+  interface Props {
+    team?: any
+  }
 
-  let savedTeams = []
+  let { team = $bindable([null, null, null, null, null, null]) }: Props = $props()
+
+  let savedTeams = $state([])
 
   // const teamStorage = LocalStorage('savedTeams', []);
 
   let dialog
 
-  const dispatch = createEventDispatcher()
-
-  function showModal() {
+  function startSelect() {
     const s = localStorage.getItem('savedTeams')
     if (s === null) {
       localStorage.setItem((savedTeams = []))
@@ -26,10 +27,15 @@
   }
 </script>
 
-<button on:click={() => showModal()}>存取队伍</button>
+<button onclick={startSelect}>存取队伍</button>
 
-<dialog bind:this={dialog} on:click|self={() => dialog.close()}>
-  <button class="close" on:click={() => dialog.close()}>X</button>
+<dialog
+  bind:this={dialog}
+  onclick={(ev) => {
+    if (ev.target === dialog) dialog.close()
+  }}
+>
+  <button class="close" onclick={() => dialog.close()}>X</button>
   {#each savedTeams as savedTeam, i}
     <div class="line">
       <div class="left">
@@ -39,7 +45,7 @@
         ABCDEF
         <button
           class="rename"
-          on:click={() => {
+          onclick={() => {
             const r = prompt('改名')
             if (r !== null) {
               savedTeam.name = r
@@ -49,13 +55,13 @@
         >
         <button
           class="load"
-          on:click={() => {
+          onclick={() => {
             team = savedTeam.team
           }}>取</button
         >
         <button
           class="erase"
-          on:click={() => {
+          onclick={() => {
             savedTeams.splice(i, 1)
             savedTeams = savedTeams
             save()
@@ -63,7 +69,7 @@
         >
         <button
           class="write"
-          on:click={() => {
+          onclick={() => {
             savedTeam.team = team
             save()
           }}>存</button
@@ -75,7 +81,7 @@
     <div class="left"></div>
     <div class="right">
       <button
-        on:click={() => {
+        onclick={() => {
           savedTeams = [...savedTeams, { name: '队伍 ' + (savedTeams.length + 1), team }]
           save()
         }}>新</button

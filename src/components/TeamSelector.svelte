@@ -1,23 +1,21 @@
-<script>
-  export let team = [null, null, null, null, null, null]
-
+<!-- @migration-task Error while migrating Svelte code: Cannot reassign or bind to each block argument in runes mode. Use the array and index variables instead (e.g. `array[i] = value` instead of `entry = value`) -->
+<script lang="ts">
   import LoadSaveTeam from './LoadSaveTeam.svelte'
   import Player from './Player.svelte'
+  let { team = $bindable([null, null, null, null, null, null]), param = null } = $props()
+
+  const param_render = $derived(param)
 </script>
 
 <div class="playergrid">
   <LoadSaveTeam bind:team />
 
   {#each team as player, pos}
+    {#snippet param({ style })}
+      {@render param_render?.({ pos, style })}
+    {/snippet}
     <div>
-      <Player
-        {player}
-        on:setStyle={(ev) => {
-          player = ev.detail
-        }}
-      >
-        <slot slot="param" name="param" {pos} let:style {style}></slot>
-      </Player>
+      <Player {player} {param} setStyle={(st) => (team[pos] = st)} />
     </div>
   {/each}
 </div>

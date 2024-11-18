@@ -1,3 +1,3 @@
 <script lang="ts">
-  export let storeKey
+  let { storeKey } = $props()
 </script>

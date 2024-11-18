@@ -5,7 +5,7 @@
 
   let prolog_init = DEFAULT_INIT
 
-  $: ser = () => JSON.stringify({})
+  let ser = $derived(() => JSON.stringify({}))
   const des = (storedString) => ({} = JSON.parse(storedString))
 
   const listener = (event) => {
@@ -20,7 +20,11 @@
     window.removeEventListener('storage', listener)
   })
 
-  $: des(localStorage[STORE_KEY] ?? '{}')
+  $effect(() => {
+    des(localStorage[STORE_KEY] ?? '{}')
+  })
 
-  $: localStorage[storeKey] = ser()
+  $effect(() => {
+    localStorage[storeKey] = ser()
+  })
 </script>

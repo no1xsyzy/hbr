@@ -1,9 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
 
-  export let apparentTeam
-  export let storeKey
-
   import TeamSelector from './TeamSelector.svelte'
   import BattleSelector from './BattleSelector.svelte'
   import Enemy from './Enemy.svelte'
@@ -12,21 +9,24 @@
 
   import { styles } from '../lib/data.ts'
   import { translate } from '../lib/translate.ts'
+  let { storeKey } = $props()
 
   type Action = 'OD' | { style: string; skill: string }
 
-  let team = [null, null, null, null, null, null]
-  let params = Array(6)
-    .fill(0)
-    .map(() => ({
-      breakthrough: 0,
-      driveboost: 0,
-      braceletEl: 'Fire',
-      chain: 3,
-      initSp: 1,
-    }))
-  let enemies = [null, null, null]
-  let moves = [
+  let team = $state([null, null, null, null, null, null])
+  let params = $state(
+    Array(6)
+      .fill(0)
+      .map(() => ({
+        breakthrough: 0,
+        driveboost: 0,
+        braceletEl: 'Fire',
+        chain: 3,
+        initSp: 1,
+      })),
+  )
+  let enemies = $state([null, null, null])
+  let moves = $state([
     [
       { style: 'LShanhua03', skill: 'LShanhuaAttackNormal', target: 'ENEMY_1' },
       { style: 'MdAngelis03', skill: 'MdAngelisAttackNormal', target: 'ENEMY_1' },
@@ -48,23 +48,36 @@
     // OD turn 3
     // normal turn
     ['OD', 'post', 1],
-  ]
-  let initialState = {}
+  ])
+  let initialState = $state({})
 
   const des = (s) => {
     const parsed = JSON.parse(s)
     ;({
       team = [null, null, null, null, null, null],
+      params = Array(6)
+        .fill(0)
+        .map(() => ({
+          breakthrough: 0,
+          driveboost: 0,
+          braceletEl: 'Fire',
+          chain: 3,
+          initSp: 1,
+        })),
       enemies = [null, null, null],
       moves = [],
       initialState = {},
     } = parsed)
   }
 
-  const ser = () => JSON.stringify({ team, enemies, moves, initialState })
+  const ser = () => JSON.stringify({ team, params, enemies, moves, initialState })
 
-  $: des(localStorage[storeKey] ?? '{}')
-  $: localStorage[storeKey] = JSON.stringify({ team, enemies, moves, initialState })
+  $effect(() => {
+    des(localStorage[storeKey] ?? '{}')
+  })
+  $effect(() => {
+    localStorage[storeKey] = ser()
+  })
 
   const listener = (event) => {
     if (event.key === storeKey && event.newValue !== null) {
@@ -77,6 +90,8 @@
   onDestroy(() => {
     window.removeEventListener('storage', listener)
   })
+
+  let apparentTeam
 
   // $: states = moves.reduce(
   //   (states, action) => {
@@ -92,16 +107,16 @@
     return Math.max(...style.limit_break.bonus_per_level.map((b) => b.step))
   }
 
-  let editCursor = null
   let dialog
+  let editCursor = $state(null)
 
-  let editoryStyle
-  let editorySkill
-  let editoryTarget
+  let editoryStyle = $state()
+  let editorySkill = $state()
+  let editoryTarget = $state()
 
   let dialogConfirm
 
-  $: if (dialog) {
+  $effect(() => {
     if (editCursor) {
       const editory = moves[editCursor[0]][editCursor[1]]
       editoryStyle = editory.style
@@ -116,11 +131,11 @@
     } else {
       dialog.close()
     }
-  }
+  })
 
-  // $: calculated = calculateMoves(moves)
+  // calculated = $derived(calculateMoves(moves))
 
-  $: calculated = [
+  let calculated = $derived([
     {
       name: 'pre1T',
       type: 'pre',
@@ -222,7 +237,7 @@
         },
       ],
     },
-  ]
+  ])
 
   const charaSkills = (styleLabel) => {
     const style = styles.find((s) => s.label === styleLabel)
@@ -237,8 +252,8 @@
   }
 </script>
 
-<TeamSelector bind:team>
-  <div slot="param" let:pos class="param flex" let:style>
+{#snippet param({ pos, style })}
+  <div class="param flex">
     <div>
       突破
       <input class="attr" type="number" bind:value={params[pos].breakthrough} min="0" max={maxBreakthrough(style)} />
@@ -274,12 +289,13 @@
     </div>
     <div>初始SP<input class="attr" type="number" bind:value={params[pos].initSp} /></div>
   </div>
-</TeamSelector>
+{/snippet}
+<TeamSelector bind:team {param} />
 
 <div class="enemygrid">
   <BattleSelector
-    on:setenemies={(ev) => {
-      enemies = [...ev.detail, null, null].slice(0, 3)
+    on:setenemies={(es) => {
+      enemies = [...es, null, null].slice(0, 3)
     }}
   />
   <Enemy enemy={enemies[2]} />
@@ -299,7 +315,7 @@
             <StyleIcon style={col.target} />
           {/if}
           <span class="padding"></span>
-          <button class="moveedit" on:click={() => (editCursor = [turn.moveIndex, i])}>*</button>
+          <button class="moveedit" onclick={() => (editCursor = [turn.moveIndex, i])}>*</button>
         </div>
 
         <div class="cell after {'pos' + (i + 1)}">
@@ -335,12 +351,12 @@
 {/each}
 
 <div class="turn new">
-  <button class="add" on:click={() => moves.push([])}>+</button>
-  <button class="minus" on:click={() => moves.pop()}>-</button>
+  <button class="add" onclick={() => moves.push([])}>+</button>
+  <button class="minus" onclick={() => moves.pop()}>-</button>
 </div>
 
 <dialog bind:this={dialog}>
-  <button class="cancel" on:click={() => (editCursor = null)}>取消</button>
+  <button class="cancel" onclick={() => (editCursor = null)}>取消</button>
 </dialog>
 
 <style>

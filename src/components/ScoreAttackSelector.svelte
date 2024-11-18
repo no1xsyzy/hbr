@@ -1,32 +1,30 @@
 <script>
-  import { createEventDispatcher } from 'svelte'
   import { score_attack, ACNames, CCNames, 国服高分, 当前国服置顶, BattleNames } from '../lib/data.ts'
   import { translateType, segip } from '../lib/utils.ts'
 
-  const dispatch = createEventDispatcher()
+  let { setenemies } = $props()
 
-  let sel
+  let sel = $state()
 
-  $: border_line = Array(sel.battle.battles[0].bn.length)
-    .fill(0)
-    .map((_, i) => {
-      sel.battle.battles.map((this_b) => [this_b.d, this_b.rbl[i]])
-    })
+  let border_line = $derived(
+    Array(sel.battle.battles[0].bn.length)
+      .fill(0)
+      .map((_, i) => {
+        sel.battle.battles.map((this_b) => [this_b.d, this_b.rbl[i]])
+      }),
+  )
 
-  let difficulty = 120
+  let difficulty = $state(120)
 
-  let scoreAttackLines
-  let scoreAttackEnemies
-
-  $: {
-    const newScoreAttackLines = {}
+  let [scoreAttackLines, scoreAttackEnemies] = $derived.by(() => {
+    const scoreAttackLines = {}
     const attr_lines = [
       ['border', 'rbl'],
       ['dp', 'dl'],
       ['hp', 'hl'],
       ['attack', 'al'],
     ]
-    scoreAttackEnemies = sel.battle.battles[0].bn.flatMap((e, index) =>
+    const scoreAttackEnemies = sel.battle.battles[0].bn.flatMap((e, index) =>
       e === null
         ? []
         : [
@@ -40,25 +38,21 @@
     )
 
     for (const [a, b] of attr_lines) {
-      newScoreAttackLines[a] = []
+      scoreAttackLines[a] = []
       for (const { index } of scoreAttackEnemies) {
-        newScoreAttackLines[a].push([])
+        scoreAttackLines[a].push([])
         for (const kp of sel.battle.battles) {
-          newScoreAttackLines[a][index].push([kp.d, kp[b][index]])
+          scoreAttackLines[a][index].push([kp.d, kp[b][index]])
         }
       }
     }
-    scoreAttackLines = newScoreAttackLines
-  }
+    return [scoreAttackLines, scoreAttackEnemies]
+  })
 
-  let border_lines = []
-  let dp_lines = []
-  let hp_lines = []
-
-  $: {
-    let new_border_lines = []
-    let new_dp_lines = []
-    let new_hp_lines = []
+  let [border_lines, dp_lines, hp_lines] = $derived.by(() => {
+    const border_lines = []
+    const dp_lines = []
+    const hp_lines = []
 
     const nEnemies = sel.battle.battles[0].bn.length
 
@@ -85,23 +79,23 @@
       }
     }
 
-    border_lines = new_border_lines
-    dp_lines = new_dp_lines
-    hp_lines = new_hp_lines
-  }
+    return [border_lines, dp_lines, hp_lines]
+  })
 
-  $: realEnemies = rEnemies.map((e, i) =>
-    e === null
-      ? null
-      : {
-          ...e,
-          border: segip(border_lines[i], difficulty),
-          dp: segip(dp_lines[i], difficulty),
-          hp: segip(hp_lines[i], difficulty),
-        },
+  let realEnemies = $derived(
+    rEnemies.map((e, i) =>
+      e === null
+        ? null
+        : {
+            ...e,
+            border: segip(border_lines[i], difficulty),
+            dp: segip(dp_lines[i], difficulty),
+            hp: segip(hp_lines[i], difficulty),
+          },
+    ),
   )
 
-  let search = ''
+  let search = $state('')
 
   function all(arr, { isFunc = false } = {}) {
     for (let it of arr) {
@@ -182,8 +176,8 @@
   </div>
   难度：<input type="number" bind:value={difficulty} />
   <button
-    on:click={() => {
-      if (realEnemies) dispatch('setenemies', realEnemies)
+    onclick={() => {
+      if (realEnemies) setenemies(realEnemies)
     }}>→</button
   >
 </div>

@@ -1,39 +1,39 @@
 <script>
-  import { createEventDispatcher } from 'svelte'
   import { battles, score_attack, ACNames, CCNames, 国服高分, 当前国服置顶, BattleNames } from '../lib/data.ts'
   import { translateType, segip } from '../lib/utils.ts'
 
-  const dispatch = createEventDispatcher()
+  let { setenemies } = $props()
 
-  let sel
+  let sel = $state()
 
-  $: border_line =
+  let border_line = $derived(
     sel?.type !== 'score_attack'
       ? null
       : Array(sel.battle.battles[0].bn.length)
           .fill(0)
           .map((_, i) => {
             sel.battle.battles.map((this_b) => [this_b.d, this_b.rbl[i]])
-          })
+          }),
+  )
 
-  $: dp_lines = sel?.type !== 'score_attack' ? null : 1
-  $: hp_lines = sel?.type !== 'score_attack' ? null : 1
-  let difficulty = 120
+  let dp_lines = $derived(sel?.type !== 'score_attack' ? null : 1)
+  let hp_lines = $derived(sel?.type !== 'score_attack' ? null : 1)
+  let difficulty = $state(120)
 
-  let scoreAttackLines
-  let scoreAttackEnemies
+  // let scoreAttackLines = $state()
+  // let scoreAttackEnemies = $state()
 
-  $: if (sel?.type !== 'score_attack') {
-    scoreAttackLines = {}
-  } else {
-    scoreAttackLines = {}
+  let [scoreAttackLines, scoreAttackEnemies] = $derived.by(() => {
+    if (sel?.type !== 'score_attack') {
+      return [null, null]
+    }
     const attr_lines = [
       ['border', 'rbl'],
       ['dp', 'dl'],
       ['hp', 'hl'],
       ['attack', 'al'],
     ]
-    scoreAttackEnemies = sel.battle.battles[0].bn.flatMap((e, index) =>
+    const enemies = sel.battle.battles[0].bn.flatMap((e, index) =>
       e === null
         ? []
         : [
@@ -46,83 +46,81 @@
           ],
     )
 
+    const lines = {}
     for (const [a, b] of attr_lines) {
-      scoreAttackLines[a] = []
-      for (const { index } of scoreAttackEnemies) {
-        scoreAttackLines[a].push([])
+      lines[a] = []
+      for (const { index } of enemies) {
+        lines[a].push([])
         for (const kp of sel.battle.battles) {
-          scoreAttackLines[a][index].push([kp.d, kp[b][index]])
+          lines[a][index].push([kp.d, kp[b][index]])
         }
       }
     }
-  }
+    return [lines, enemies]
+  })
 
-  $: getRealEnemiesFromDifficulty =
-    sel?.type !== 'score_attack'
-      ? null
-      : (() => {
-          const border_lines = []
-          const dp_lines = []
-          const hp_lines = []
+  let getRealEnemiesFromDifficulty = $derived.by(() => {
+    if (sel?.type !== 'score_attack') return null
+    const border_lines = []
+    const dp_lines = []
+    const hp_lines = []
 
-          const nEnemies = sel.battle.battles[0].bn.length
+    const nEnemies = sel.battle.battles[0].bn.length
 
-          const rEnemies = sel.battle.battles[0].bn.map((e) =>
-            e === null
-              ? null
-              : {
-                  name: e.n,
-                  resist: e.r
-                    .map(([type, rate]) => ({ type: translateType(type), rate }))
-                    .sort((x, y) => x.rate - y.rate),
-                },
-          )
+    const rEnemies = sel.battle.battles[0].bn.map((e) =>
+      e === null
+        ? null
+        : {
+            name: e.n,
+            resist: e.r.map(([type, rate]) => ({ type: translateType(type), rate })).sort((x, y) => x.rate - y.rate),
+          },
+    )
 
-          for (let i = 0; i < nEnemies; i++) {
-            border_lines.push([])
-            dp_lines.push([])
-            hp_lines.push([])
-          }
+    for (let i = 0; i < nEnemies; i++) {
+      border_lines.push([])
+      dp_lines.push([])
+      hp_lines.push([])
+    }
 
-          for (let kp of sel.battle.battles) {
-            for (let i = 0; i < nEnemies; i++) {
-              border_lines[i].push([kp.d, kp.rbl[i]])
-              dp_lines[i].push([kp.d, kp.dl[i]])
-              hp_lines[i].push([kp.d, kp.hl[i]])
-            }
-          }
+    for (let kp of sel.battle.battles) {
+      for (let i = 0; i < nEnemies; i++) {
+        border_lines[i].push([kp.d, kp.rbl[i]])
+        dp_lines[i].push([kp.d, kp.dl[i]])
+        hp_lines[i].push([kp.d, kp.hl[i]])
+      }
+    }
 
-          return (h) =>
-            rEnemies.map((e, i) =>
-              e === null
-                ? null
-                : {
-                    ...e,
-                    border: segip(border_lines[i], h),
-                    dp: segip(dp_lines[i], h),
-                    hp: segip(hp_lines[i], h),
-                  },
-            )
-        })()
+    return (h) =>
+      rEnemies.map((e, i) =>
+        e === null
+          ? null
+          : {
+              ...e,
+              border: segip(border_lines[i], h),
+              dp: segip(dp_lines[i], h),
+              hp: segip(hp_lines[i], h),
+            },
+      )
+  })
 
-  $: realEnemies =
-    sel?.type === 'normal'
-      ? sel.battle.enemy_list.map((e) =>
-          e === null
-            ? null
-            : {
-                name: e.name,
-                border: e.base_param.param_border,
-                dp: e.base_param.dp,
-                hp: e.base_param.hp,
-                resist: e.resist.map(([type, rate]) => ({ type: translateType(type), rate })),
-              },
-        )
-      : sel?.type === 'score_attack'
-        ? getRealEnemiesFromDifficulty(difficulty)
-        : null
+  let realEnemies = $derived.by(() => {
+    if (sel?.type === 'normal')
+      return sel.battle.enemy_list.map((e) =>
+        e === null
+          ? null
+          : {
+              name: e.name,
+              border: e.base_param.param_border,
+              dp: e.base_param.dp,
+              hp: e.base_param.hp,
+              resist: e.resist.map(([type, rate]) => ({ type: translateType(type), rate })),
+            },
+      )
+    if (sel?.type === 'score_attack') return getRealEnemiesFromDifficulty(difficulty)
+    return null
+  })
 
-  let search = ''
+  let search = $state('')
 
   function all(arr, { isFunc = false } = {}) {
     for (let it of arr) {
@@ -290,8 +288,8 @@
     难度：<input type="number" bind:value={difficulty} />
   {/if}
   <button
-    on:click={() => {
-      if (realEnemies) dispatch('setenemies', realEnemies)
+    onclick={() => {
+      if (realEnemies) setenemies(realEnemies)
     }}>→</button
   >
 </div>

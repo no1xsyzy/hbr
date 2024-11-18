@@ -1,15 +1,10 @@
-<script>
-  export let enemy
-  export let chosen
-  import { createEventDispatcher } from 'svelte'
-
-  const dispatch = createEventDispatcher()
-
+<script lang="ts">
   import Symbol from './Symbol.svelte'
+  let { enemy, chosen, onclick } = $props()
 </script>
 
 {#if enemy}
-  <div class="enemy" class:chosen on:click={(e) => dispatch('click', e)}>
+  <div class="enemy" class:chosen {onclick}>
     <div>{enemy.name}</div>
     <div>Border: {enemy.border}</div>
     <div>DP: {enemy.dp}</div>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  export let storeKey
   import * as echarts from 'echarts'
 
   import { styles, B服实装 } from '../lib/data.ts'
@@ -8,12 +7,9 @@
 
   import lsq from 'least-squares'
 
-  export let active
+  let { storeKey, active } = $props()
 
   const days = 86400_000
-
-  let root
-  let chart
 
   function datasetFromMap(mapDstrStyles: {
     [datestring: string]: string[]
@@ -134,8 +130,8 @@
     ],
   }
 
-  $: bili = datasetFromMap(B服实装)
-  $: wfs = datasetFromMap(mapDFromStyles(styles))
+  let bili = datasetFromMap(B服实装)
+  let wfs = datasetFromMap(mapDFromStyles(styles))
 
   function draw_line(point_of, from, to, interval) {
     const result = []
@@ -146,28 +142,34 @@
     return result
   }
 
-  $: x_w0 = day0s.W服.getTime()
-  $: x_b0 = day0s.B服.getTime()
-  $: x_wb = (wfs.b - bili.b) / (bili.m - wfs.m)
-  $: x_end = x_wb + 365 * 86400_000
+  let x_w0 = day0s.W服.getTime()
+  let x_b0 = day0s.B服.getTime()
+  let x_wb = (wfs.b - bili.b) / (bili.m - wfs.m)
+  let x_end = x_wb + 365 * 86400_000
 
-  $: wfs_guess = {
+  let wfs_guess = {
     source: [...draw_line(wfs.point_of, x_w0, x_wb, 14 * days), ...draw_line(wfs.point_of, x_wb, x_end, 14 * days)],
   }
-  $: bili_guess = {
+  let bili_guess = {
     source: [...draw_line(bili.point_of, x_b0, x_wb, 14 * days), ...draw_line(wfs.point_of, x_wb, x_end, 14 * days)],
   }
 
   // $: wfs_guess = { source: [p_w0, p_wb, p_end] }
   // $: bili_guess = { source: [p_b0, p_wb, p_end] }
 
-  $: root && (chart = echarts.init(root))
-  $: chart && chart.setOption(baseOption)
-  $: chart && chart.setOption({ dataset: [wfs.dataset, bili.dataset, wfs_guess, bili_guess] })
-  $: chart && active && chart.resize()
+  function renderChart(root) {
+    const chart = echarts.init(root)
+    $effect(() => {
+      chart.setOption({ ...baseOption, dataset: [wfs.dataset, bili.dataset, wfs_guess, bili_guess] })
+    })
+
+    $effect(() => {
+      active && chart.resize()
+    })
+  }
 </script>
 
-<div class="chart" bind:this={root}></div>
+<div class="chart" use:renderChart></div>
 
 <style>
   .chart {

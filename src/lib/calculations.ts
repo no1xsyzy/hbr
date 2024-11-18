@@ -21,7 +21,7 @@ export function skillsFromTeam<T>(team: { params: T; style: Style }[]): (Skill &
       const sameCharaStyles = styles.filter((s) => s.chara_label === currentChara)
       return sameCharaStyles.flatMap(({ generalize, skills, label }) => {
         return skills.flatMap((s) =>
-          s.is_restricted === 0 || generalize || label == pl.style.label ? [{ ...s, ownerParams: pl.params }] : [],
+          s.is_restricted === 0 || generalize || label == currentStyle ? [{ ...s, ownerParams: pl.params }] : [],
         )
       })
     })
@@ -116,10 +116,10 @@ function attackDataFromPart<ParamType>(pt: NormalPart & PartExt<ParamType>): Att
   }
 }
 
-export function procOn<Key extends string, SourceType extends { [k in Key]: any }, RetType>(
+export function procOn<Key extends string, SourceType extends { [k in Key]: string }, RetType>(
   source: SourceType[],
   key: Key,
-  processors: { [skill_type: string]: (pt: SourceType) => RetType[] },
+  processors: { [key: string]: (pt: SourceType) => RetType[] },
 ): RetType[] {
   return source.flatMap((pt) => processors[pt?.[key]]?.(pt) ?? [])
 }

@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
-  const dispatch = createEventDispatcher()
-
   import { translateType, filterFromSearch } from '../lib/utils.ts'
   import { styles, translation } from '../lib/data.ts'
   import { translate, translateLabel } from '../lib/translate.ts'
@@ -15,25 +12,31 @@
     param: any
   }
 
-  export let player: Player
+  interface Props {
+    player: Player
+    param?: import('svelte').Snippet<[any]>
+    setStyle: (style: string | null) => void
+  }
+
+  let { player = $bindable(), param, setStyle }: Props = $props()
 
   let dialog
-  let search = ''
+  let search = $state('')
 
   function showDialog() {
     search = ''
     dialog.showModal()
   }
 
-  $: searchedStyles = styles.filter(filterFromSearch(search))
+  let searchedStyles = $derived(styles.filter(filterFromSearch(search)))
 </script>
 
 {#if player === null}
-  <button class="noplayer" on:click={showDialog}>+</button>
+  <button class="noplayer" onclick={showDialog}>+</button>
 {:else}
   <div class="player">
-    <button on:click={showDialog}>编队</button>
-    <button on:click={() => dispatch('setStyle', null)}>解除</button>
+    <button onclick={showDialog}>编队</button>
+    <button onclick={() => setStyle(null)}>解除</button>
     <div>
       <StyleIcon style={player} size="100px" />
       <!-- <img src={'hbr/' + player.style.image} alt={player.style.label} /> -->
@@ -41,19 +44,19 @@
     <div>
       {translateLabel(player).name}
     </div>
-    <slot name="param" style={player}></slot>
+    {@render param?.({ style: player })}
   </div>
 {/if}
 
 <dialog bind:this={dialog}>
   <input class="search" placeholder="搜索" type="text" bind:value={search} />
-  <button class="cancel" on:click={() => dialog.close()}>取消</button>
+  <button class="cancel" onclick={() => dialog.close()}>取消</button>
   <div class="flex scroll">
     {#each searchedStyles as st (st.label)}
       <div
         class="altStyle"
-        on:click={() => {
-          dispatch('setStyle', st.label)
+        onclick={() => {
+          setStyle(st.label)
           dialog.close()
         }}
       >
@@ -89,13 +92,6 @@
     justify-content: flex-start;
     align-items: flex-start;
     align-content: flex-start;
-  }
-  .attr {
-    width: 6ch;
-  }
-  .style,
-  .style > img {
-    width: 198px;
   }
   dialog {
     width: 800px;

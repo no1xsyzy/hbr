@@ -11,37 +11,39 @@
   import Symbol from './Symbol.svelte'
   import TeamSelector from './TeamSelector.svelte'
 
-  export let storeKey
+  let { storeKey } = $props()
 
   // $: store = new LocalStorage(storeKey)
 
   const simpleFixed = (num, pass) => num.toFixed(pass).replace(/\.?0+$/, '')
 
-  let team = [null, null, null, null, null, null]
-  let params = Array(6)
-    .fill(0)
-    .map(() => ({
-      str: 300,
-      dex: 300,
-      con: 300,
-      spr: 300,
-      wis: 300,
-      luk: 300,
-    }))
-  let enemies = [null, null, null]
-  let focusAt = 0
-  let nukeLabel = null
-  let extraParam = null
-  let attackUps = {}
-  let defenseDowns = {}
-  let isCritical = true
-  let criticalRateUps = {}
-  let criticalDamageUps = {}
-  let zone = null
-  let breakRate = 100
-  let fragiles = {}
-  let mindEyes = {}
-  let funnels = {}
+  let team = $state([null, null, null, null, null, null])
+  let params = $state(
+    Array(6)
+      .fill(0)
+      .map(() => ({
+        str: 300,
+        dex: 300,
+        con: 300,
+        spr: 300,
+        wis: 300,
+        luk: 300,
+      })),
+  )
+  let enemies = $state([null, null, null])
+  let focusAt = $state(0)
+  let nukeLabel = $state(null)
+  let extraParam = $state(null)
+  let attackUps = $state({})
+  let defenseDowns = $state({})
+  let isCritical = $state(true)
+  let criticalRateUps = $state({})
+  let criticalDamageUps = $state({})
+  let zone = $state(null)
+  let breakRate = $state(100)
+  let fragiles = $state({})
+  let mindEyes = $state({})
+  let funnels = $state({})
 
   const des = (storedString) =>
     ({
@@ -104,33 +106,20 @@
     window.removeEventListener('storage', listener)
   })
 
-  $: des(localStorage[storeKey] ?? '{}')
-
-  $: localStorage[storeKey] = JSON.stringify({
-    team,
-    params,
-    enemies,
-    focusAt,
-    nukeLabel,
-    extraParam,
-    attackUps,
-    defenseDowns,
-    isCritical,
-    criticalRateUps,
-    criticalDamageUps,
-    zone,
-    breakRate,
-    fragiles,
-    mindEyes,
-    funnels,
+  $effect(() => {
+    des(localStorage[storeKey] ?? '{}')
   })
 
-  $: focusAt ??= enemies.flatMap((x, i) => (x ? [i] : []))?.[0] ?? null
+  $effect(() => {
+    localStorage[storeKey] = ser()
+  })
 
-  $: focusEnemy = enemies[focusAt] ?? null
+  $effect.pre(() => {
+    focusAt ??= enemies.flatMap((x, i) => (x ? [i] : []))?.[0] ?? null
+  })
 
-  const flatten = (x, y) => [...x, ...y]
-  const stackable = (effect) => ({ ...effect, stack: 0 })
+  let focusEnemy = $derived(enemies[focusAt] ?? null)
+
   const multiplierFromResists = (rs) => rs.map((r) => 1 - 0.01 * r.rate).reduce((x, y) => x * y, 1)
 
   const ATTACK_TYPES = [
@@ -158,150 +147,155 @@
     ownerParams: pt.ownerParams,
   })
 
-  $: apparentTeam = team.flatMap((pl, i) =>
-    pl ? [{ style: styles.filter((s) => s.label === pl), params: params[i] }] : [],
+  $inspect('team', team)
+
+  let apparentTeam = $derived(
+    team.flatMap((pl, i) => (pl ? [{ style: styles.find((s) => s.label === pl), params: params[i] }] : [])),
   )
 
-  $: allSkills = apparentTeam
-    .filter((p) => p)
-    .flatMap((pl) => {
-      const currentStyle = pl.style.label
-      const currentChara = pl.style.chara_label
-      const sameCharaStyles = styles.filter((s) => s.chara_label === currentChara)
-      return sameCharaStyles.flatMap(({ generalize, skills, label }) => {
-        return skills.flatMap((s) =>
-          s.is_restricted === 0 || generalize || label == pl.style.label ? [{ ...s, ownerParams: pl.params }] : [],
-        )
-      })
-    })
+  $inspect('apparentTeam', apparentTeam)
 
-  $: allParts = allSkills.flatMap(function resolveNestedPartsFromSkill({
-    ownerParams,
-    parts,
-    name,
-    label,
-    hits,
-    hit_count,
-  }) {
-    if (parts[0].skill_type === 'SkillSwitch') {
-      return parts[0].strval
-        .map((skk, i) => ({ ...skk, ownerParams, name: name + ' / ' + `SKILL ${i + 1}` }))
-        .flatMap(resolveNestedPartsFromSkill)
-    } else if (['SkillRandom', 'SkillCondition'].includes(parts[0].skill_type)) {
-      return parts[0].strval
-        .map((skk) => ({ ...skk, ownerParams, name: name + ' / ' + skk.desc }))
-        .flatMap(resolveNestedPartsFromSkill)
-    } else {
-      const count = {}
-      return parts.map((pt, i) => {
-        return ATTACK_TYPES.includes(pt.skill_type)
-          ? {
-              ...pt,
-              ownerParams,
-              name,
-              label,
-              key: label + '/' + i,
-              skHits: hits.length > 0 ? hits.map((h) => h.power_ratio) : Array(hit_count).fill(1 / hit_count),
-            }
-          : {
-              ...pt,
-              ownerParams,
-              name,
-              label,
-              key: label + '/' + i,
-            }
-      })
-    }
-  })
+  let allSkills = $derived(
+    apparentTeam
+      .filter((p) => p)
+      .flatMap((pl) => {
+        const currentStyle = pl.style.label
+        const currentChara = pl.style.chara_label
+        const sameCharaStyles = styles.filter((s) => s.chara_label === currentChara)
+        return sameCharaStyles.flatMap(({ generalize, skills, label }) => {
+          return skills.flatMap((s) =>
+            s.is_restricted === 0 || generalize || label == pl.style.label ? [{ ...s, ownerParams: pl.params }] : [],
+          )
+        })
+      }),
+  )
 
-  $: allNukes = allParts.flatMap((pt) => {
-    switch (pt.skill_type) {
-      case 'AttackSkill':
-        return [attackDataFromPart(pt)]
-      case 'TokenAttack':
-        return [
-          {
-            ...attackDataFromPart(pt),
-            extraParam: {
-              name: 'token',
-              type: 'integer',
-              min: 0,
-              max: 10,
-              default: 10,
-              mul: (x) => 1 + x * pt.value[0],
+  $inspect('allSkills', allSkills)
+
+  let allParts = $derived(
+    allSkills.flatMap(function resolveNestedPartsFromSkill({ ownerParams, parts, name, label, hits, hit_count }) {
+      if (parts[0].skill_type === 'SkillSwitch') {
+        return parts[0].strval
+          .map((skk, i) => ({ ...skk, ownerParams, name: name + ' / ' + `SKILL ${i + 1}` }))
+          .flatMap(resolveNestedPartsFromSkill)
+      } else if (['SkillRandom', 'SkillCondition'].includes(parts[0].skill_type)) {
+        return parts[0].strval
+          .map((skk) => ({ ...skk, ownerParams, name: name + ' / ' + skk.desc }))
+          .flatMap(resolveNestedPartsFromSkill)
+      } else {
+        const count = {}
+        return parts.map((pt, i) => {
+          return ATTACK_TYPES.includes(pt.skill_type)
+            ? {
+                ...pt,
+                ownerParams,
+                name,
+                label,
+                key: label + '/' + i,
+                skHits: hits.length > 0 ? hits.map((h) => h.power_ratio) : Array(hit_count).fill(1 / hit_count),
+              }
+            : {
+                ...pt,
+                ownerParams,
+                name,
+                label,
+                key: label + '/' + i,
+              }
+        })
+      }
+    }),
+  )
+
+  let allNukes = $derived(
+    allParts.flatMap((pt) => {
+      switch (pt.skill_type) {
+        case 'AttackSkill':
+          return [attackDataFromPart(pt)]
+        case 'TokenAttack':
+          return [
+            {
+              ...attackDataFromPart(pt),
+              extraParam: {
+                name: 'token',
+                type: 'integer',
+                min: 0,
+                max: 10,
+                default: 10,
+                mul: (x) => 1 + x * pt.value[0],
+              },
             },
-          },
-        ]
-      case 'PenetrationCriticalAttack':
-        return [
-          {
-            ...attackDataFromPart(pt),
-            penetration: pt.value[0],
-          },
-        ]
-      case 'DamageRateChangeAttackSkill':
-        const attackData = attackDataFromPart(pt)
-        return [
-          attackData,
-          {
-            ...attackData,
-            name: pt.name + ' / ' + pt.cond,
-            power: pt.power.map((x) => x * pt.value[1]),
-            multipliers: { ...pt.multipliers, dr: pt.value[0] },
-          },
-        ]
-      case 'AttackByOwnDpRate':
-        return [
-          {
-            ...attackDataFromPart(pt),
-            extraParam: {
-              name: 'dp%',
-              type: 'number',
-              min: 0,
-              max: 100,
-              default: 100,
-              mul: (x) =>
-                segip(
-                  [
-                    [0, pt.value[0]],
-                    [100, pt.value[1]],
-                  ],
-                  x,
-                ),
+          ]
+        case 'PenetrationCriticalAttack':
+          return [
+            {
+              ...attackDataFromPart(pt),
+              penetration: pt.value[0],
             },
-          },
-        ]
-      case 'AttackBySp':
-        return [
-          {
-            ...attackDataFromPart(pt),
-            extraParam: {
-              name: 'sp',
-              type: 'integer',
-              min: 1,
-              max: pt.value[0],
-              default: pt.value[0],
-              mul: (x) =>
-                segip(
-                  [
-                    [0, 0],
-                    [pt.value[0], 1],
-                  ],
-                  x,
-                ),
+          ]
+        case 'DamageRateChangeAttackSkill':
+          const attackData = attackDataFromPart(pt)
+          return [
+            attackData,
+            {
+              ...attackData,
+              name: pt.name + ' / ' + pt.cond,
+              power: pt.power.map((x) => x * pt.value[1]),
+              multipliers: { ...pt.multipliers, dr: pt.value[0] },
             },
-          },
-        ]
-      case 'FixedHpDamageRateAttack': // TODO:
-        return [
-          {
-            ...attackDataFromPart(pt),
-          },
-        ]
-      default:
-        return []
-    }
-  })
+          ]
+        case 'AttackByOwnDpRate':
+          return [
+            {
+              ...attackDataFromPart(pt),
+              extraParam: {
+                name: 'dp%',
+                type: 'number',
+                min: 0,
+                max: 100,
+                default: 100,
+                mul: (x) =>
+                  segip(
+                    [
+                      [0, pt.value[0]],
+                      [100, pt.value[1]],
+                    ],
+                    x,
+                  ),
+              },
+            },
+          ]
+        case 'AttackBySp':
+          return [
+            {
+              ...attackDataFromPart(pt),
+              extraParam: {
+                name: 'sp',
+                type: 'integer',
+                min: 1,
+                max: pt.value[0],
+                default: pt.value[0],
+                mul: (x) =>
+                  segip(
+                    [
+                      [0, 0],
+                      [pt.value[0], 1],
+                    ],
+                    x,
+                  ),
+              },
+            },
+          ]
+        case 'FixedHpDamageRateAttack': // TODO:
+          return [
+            {
+              ...attackDataFromPart(pt),
+            },
+          ]
+        default:
+          return []
+      }
+    }),
+  )
 
   const injectNukeTruePower = (nuke) => {
     const ePar = mat(nuke.params, nuke.ownerParams)
@@ -349,10 +343,10 @@
     return { ...effect, truePower: effect.power }
   }
 
-  let nuke
-  let extraParamCfg = null
+  let nuke = $state()
+  let extraParamCfg = $state(null)
 
-  $: {
+  $effect.pre(() => {
     const theNuke = allNukes.find((x) => x.label === nukeLabel)
     if (theNuke) {
       nuke = injectNukeTruePower(theNuke)
@@ -366,15 +360,15 @@
         extraParamCfg = newExtraParamCfg
       }
     } else {
-      nuke = extraParam = null
+      nuke = extraParamCfg = extraParam = null
     }
-  }
+  })
 
-  $: attackType = nuke?.type ?? ''
-  $: attackElement = nuke?.element ?? ''
+  let attackType = $derived(nuke?.type ?? '')
+  let attackElement = $derived(nuke?.element ?? '')
 
-  $: partFapper =
-    (skill_type, truePowerInjector, { elemented = false, stackable = false, includeValue = false }) =>
+  const partFapper =
+    (skill_type, truePowerInjector, { elemented = false, includeValue = false } = {}) =>
     (pt) => {
       if (pt.skill_type !== skill_type) return []
 
@@ -400,46 +394,48 @@
         effect.value = pt.value
       }
 
-      if (stackable) {
-        effect.stack = 0
-      }
-
       return [truePowerInjector(effect)]
     }
 
   const byTruePower = (x, y) => y.truePower - x.truePower
 
-  $: allAttackUps = allParts.flatMap(partFapper('AttackUp', injectBuffTruePower, { elemented: true })).sort(byTruePower)
-  $: allDefDowns = allParts
-    .flatMap(partFapper('DefenseDown', injectDebuffTruePower, { elemented: true }))
-    .sort(byTruePower)
-  $: allCriticalRateUps = allParts
-    .flatMap(partFapper('CriticalRateUp', injectBuffTruePower, { elemented: true }))
-    .sort(byTruePower)
-  $: allCriticalDamageUps = allParts
-    .flatMap(partFapper('CriticalDamageUp', injectBuffTruePower, { elemented: true }))
-    .sort(byTruePower)
+  let allAttackUps = $derived(
+    allParts.flatMap(partFapper('AttackUp', injectBuffTruePower, { elemented: true })).sort(byTruePower),
+  )
+  let allDefDowns = $derived(
+    allParts.flatMap(partFapper('DefenseDown', injectDebuffTruePower, { elemented: true })).sort(byTruePower),
+  )
+  let allCriticalRateUps = $derived(
+    allParts.flatMap(partFapper('CriticalRateUp', injectBuffTruePower, { elemented: true })).sort(byTruePower),
+  )
+  let allCriticalDamageUps = $derived(
+    allParts.flatMap(partFapper('CriticalDamageUp', injectBuffTruePower, { elemented: true })).sort(byTruePower),
+  )
 
-  $: penetration = !!nuke?.penetration
-  $: resistsTyp = (focusEnemy?.resist ?? []).filter((r) => r.type == attackType)
-  $: resistsEl = (focusEnemy?.resist ?? []).filter((r) => r.type == attackElement)
-  $: resists = (focusEnemy?.resist ?? []).filter((r) => r.type == attackType || r.type == attackElement)
-  $: resistTypPlier = multiplierFromResists(resistsTyp)
-  $: resistElPlier = multiplierFromResists(resistsEl)
-  $: resistPlier = penetration ? nuke?.penetration + 1 : multiplierFromResists(resists)
+  let penetration = $derived(!!nuke?.penetration)
+  let resistsTyp = $derived((focusEnemy?.resist ?? []).filter((r) => r.type == attackType))
+  let resistsEl = $derived((focusEnemy?.resist ?? []).filter((r) => r.type == attackElement))
+  let resists = $derived((focusEnemy?.resist ?? []).filter((r) => r.type == attackType || r.type == attackElement))
+  let resistTypPlier = $derived(multiplierFromResists(resistsTyp))
+  let resistElPlier = $derived(multiplierFromResists(resistsEl))
+  let resistPlier = $derived(penetration ? nuke?.penetration + 1 : multiplierFromResists(resists))
 
-  $: isWeak = resistPlier > 1
-  $: allMindEyes = allParts.flatMap(partFapper('MindEye', injectBuffTruePower, { stackable: true })).sort(byTruePower)
-  $: allFragiles = allParts.flatMap(partFapper('Fragile', injectDebuffTruePower, { stackable: true })).sort(byTruePower)
-  $: allFunnels = allParts
-    .flatMap(partFapper('Funnel', injectFunnelTruePower, { stackable: true, includeValue: true }))
-    .sort(byTruePower)
-  $: allCharges = allParts
-    .filter((pt) => pt.skill_type == 'BuffCharge')
-    .map(injectBuffTruePower)
-    .sort(byTruePower)
+  let isWeak = $derived(resistPlier > 1)
+  let allMindEyes = $derived(allParts.flatMap(partFapper('MindEye', injectBuffTruePower)).sort(byTruePower))
+  let allFragiles = $derived(allParts.flatMap(partFapper('Fragile', injectDebuffTruePower)).sort(byTruePower))
+  let allFunnels = $derived(
+    allParts.flatMap(partFapper('Funnel', injectFunnelTruePower, { includeValue: true })).sort(byTruePower),
+  )
+  let allCharges = $derived(
+    allParts
+      .filter((pt) => pt.skill_type == 'BuffCharge')
+      .map(injectBuffTruePower)
+      .sort(byTruePower),
+  )
 
-  $: allZones = allParts.flatMap(partFapper('Zone', injectBuffTruePower, { elemented: true })).sort(byTruePower)
+  let allZones = $derived(
+    allParts.flatMap(partFapper('Zone', injectBuffTruePower, { elemented: true })).sort(byTruePower),
+  )
 
   const eNoEl = (xx) =>
     Math.round(
@@ -473,10 +469,8 @@
           )
     let totalPower = 0
     for (const sortedAllXs of sortedAllXss) {
-      console.log('sortedAllXs', sortedAllXs)
       let stacking = 0
       for (const x of sortedAllXs) {
-        console.log('x', x)
         let cstack = stackX?.[x.key] ?? 0
         while (cstack > 0) {
           cstack -= 1
@@ -494,32 +488,30 @@
     return Math.round(totalPower * 10000) / 10000
   }
 
-  $: eExtra = extraParamCfg ? extraParamCfg.mul(extraParam) : 1
-  $: eAttackUps = eFromX(allAttackUps, attackUps, attackElement) + 1
+  let eExtra = $derived(extraParamCfg ? extraParamCfg.mul(extraParam) : 1)
+  let eAttackUps = $derived(eFromX(allAttackUps, attackUps, attackElement) + 1)
 
-  $: console.log('allAttackUps', allAttackUps)
-  $: console.log('attackUps', attackUps)
-  $: console.log('attackElement', attackElement)
-  $: console.log('eFromX(allAttackUps, attackUps, attackElement) + 1', eAttackUps)
+  let eDefenseDowns = $derived(eFromX(allDefDowns, defenseDowns, attackElement) + 1)
+  let eCriticalDamageUps = $derived(
+    isCritical ? eFromX(allCriticalDamageUps, criticalDamageUps, attackElement) + 1.5 : 1,
+  )
+  let eFragiles = $derived(isWeak ? eFromX(allFragiles, fragiles, null) + 1 : 1)
+  let eMindEyes = $derived(isWeak ? eFromX(allMindEyes, mindEyes, null) + 1 : 1)
+  let eZone = $derived(allZones.find((z) => z.label === zone)?.truePower ?? 1)
+  let eBreak = $derived(breakRate / 100)
+  let eFunnel = $derived(eFromX(allFunnels, funnels, null) + 1)
 
-  $: eDefenseDowns = eFromX(allDefDowns, defenseDowns, attackElement) + 1
-  $: eCriticalDamageUps = isCritical ? eFromX(allCriticalDamageUps, criticalDamageUps, attackElement) + 1.5 : 1
-  $: eFragiles = isWeak ? eFromX(allFragiles, fragiles, null) + 1 : 1
-  $: eMindEyes = isWeak ? eFromX(allMindEyes, mindEyes, null) + 1 : 1
-  $: eZone = allZones.find((z) => z.label === zone)?.truePower ?? 1
-  $: eBreak = breakRate / 100
-  $: eFunnel = eFromX(allFunnels, funnels, null) + 1
-
-  $: hits =
+  let hits = $derived(
     nuke?.hits.concat(
       makeX(allFunnels, funnels)
         .sort((x, y) => y.truePower - x.truePower)
         .flatMap(({ stack, ...r }) => Array(stack).fill(r))
         .slice(0, 2)
         .flatMap((f) => Array(Math.max(...f.power)).fill(f.value[0])),
-    ) ?? []
+    ) ?? [],
+  )
 
-  $: beforeFunnel =
+  let beforeFunnel = $derived(
     nuke !== null
       ? Math.round(
           (isCritical ? nuke.truePowerCritical : nuke.truePower) *
@@ -533,19 +525,20 @@
               eBreak *
               resistPlier),
         )
-      : 0
+      : 0,
+  )
 
-  $: sDamageRange = hits.map((h) => [1, 0.9, 1.1].map((x) => Math.round(h * beforeFunnel * x)))
-  $: totalDmg = sDamageRange.map((x) => x[0]).reduce((x, y) => x + y, 0)
+  let sDamageRange = $derived(hits.map((h) => [1, 0.9, 1.1].map((x) => Math.round(h * beforeFunnel * x))))
+  let totalDmg = $derived(sDamageRange.map((x) => x[0]).reduce((x, y) => x + y, 0))
 
-  $: totalDmgRange = [
+  let totalDmgRange = $derived([
     sDamageRange.map((x) => x[1]).reduce((x, y) => x + y, 0),
     sDamageRange.map((x) => x[2]).reduce((x, y) => x + y, 0),
-  ]
+  ])
 </script>
 
-<TeamSelector bind:team>
-  <div slot="param" let:pos class="flex" let:style>
+{#snippet param({ pos, style })}
+  <div class="flex">
     <div>力<input class="attr" type="number" bind:value={params[pos].str} /></div>
     <div>敏<input class="attr" type="number" bind:value={params[pos].dex} /></div>
     <div>体<input class="attr" type="number" bind:value={params[pos].con} /></div>
@@ -553,17 +546,19 @@
     <div>智<input class="attr" type="number" bind:value={params[pos].wis} /></div>
     <div>运<input class="attr" type="number" bind:value={params[pos].luk} /></div>
   </div>
-</TeamSelector>
+{/snippet}
+
+<TeamSelector bind:team {param} />
 
 <div class="enemygrid">
   <BattleSelector
-    on:setenemies={(ev) => {
-      enemies = [...ev.detail, null, null].slice(0, 3)
+    setenemies={(es) => {
+      enemies = [...es, null, null].slice(0, 3)
     }}
   />
-  <Enemy enemy={enemies[2]} chosen={focusAt == 2} on:click={() => (focusAt = 2)} />
-  <Enemy enemy={enemies[0]} chosen={focusAt == 0} on:click={() => (focusAt = 0)} />
-  <Enemy enemy={enemies[1]} chosen={focusAt == 1} on:click={() => (focusAt = 1)} />
+  <Enemy enemy={enemies[2]} chosen={focusAt == 2} onclick={() => (focusAt = 2)} />
+  <Enemy enemy={enemies[0]} chosen={focusAt == 0} onclick={() => (focusAt = 0)} />
+  <Enemy enemy={enemies[1]} chosen={focusAt == 1} onclick={() => (focusAt = 1)} />
 </div>
 
 <div class="damagegrid">
@@ -610,13 +605,13 @@
     {#each allAttackUps as atkUp (atkUp.key)}
       {((attackUps[atkUp.key] ??= 0), '')}
       <div>
-        <button on:click={() => (attackUps[atkUp.key] -= attackUps[atkUp.key] > 0)}> - </button>
+        <button onclick={() => (attackUps[atkUp.key] -= attackUps[atkUp.key] > 0)}> - </button>
         <span>
           <Symbol symbol={atkUp.element} />
           {translate(atkUp).name}
           (+{simpleFixed(atkUp.truePower * 100, 2)}%) x {attackUps[atkUp.key] ?? 0}
         </span>
-        <button on:click={() => (attackUps[atkUp.key] += attackUps[atkUp.key] < 2)}> + </button>
+        <button onclick={() => (attackUps[atkUp.key] += attackUps[atkUp.key] < 2)}> + </button>
       </div>
     {/each}
   </div>
@@ -626,13 +621,13 @@
     {#each allDefDowns as defDown (defDown.key)}
       {((defenseDowns[defDown.key] ??= 0), '')}
       <div>
-        <button on:click={() => (defenseDowns[defDown.key] -= defenseDowns[defDown.key] > 0)}> - </button>
+        <button onclick={() => (defenseDowns[defDown.key] -= defenseDowns[defDown.key] > 0)}> - </button>
         <Symbol symbol={defDown.element} />
         <span>
           {translate(defDown).name}
           (+{simpleFixed(defDown.truePower * 100, 2)}%) x {defenseDowns[defDown.key] ?? 0}
         </span>
-        <button on:click={() => (defenseDowns[defDown.key] += defenseDowns[defDown.key] < 2)}> + </button>
+        <button onclick={() => (defenseDowns[defDown.key] += defenseDowns[defDown.key] < 2)}> + </button>
       </div>
     {/each}
   </div>
@@ -645,13 +640,13 @@
     {#each allCriticalDamageUps as cDmgUp (cDmgUp.key)}
       {((criticalDamageUps[cDmgUp.key] ??= 0), '')}
       <div>
-        <button on:click={() => (criticalDamageUps[cDmgUp.key] -= criticalDamageUps[cDmgUp.key] > 0)}> - </button>
+        <button onclick={() => (criticalDamageUps[cDmgUp.key] -= criticalDamageUps[cDmgUp.key] > 0)}> - </button>
         <span>
           <Symbol symbol={cDmgUp.element} forceNeoSymbol="1" />
           {translate(cDmgUp).name}
           (+{simpleFixed(cDmgUp.truePower * 100, 2)}%) x {criticalDamageUps[cDmgUp.key]}
         </span>
-        <button on:click={() => (criticalDamageUps[cDmgUp.key] += criticalDamageUps[cDmgUp.key] < 2)}> + </button>
+        <button onclick={() => (criticalDamageUps[cDmgUp.key] += criticalDamageUps[cDmgUp.key] < 2)}> + </button>
       </div>
     {/each}
   </div>
@@ -704,9 +699,9 @@
     {#each allMindEyes as mind (mind.key)}
       {((mindEyes[mind.key] ??= 0), '')}
       <div>
-        <button on:click={() => (mindEyes[mind.key] -= mindEyes[mind.key] > 0)} disabled={!isWeak}> - </button>
+        <button onclick={() => (mindEyes[mind.key] -= mindEyes[mind.key] > 0)} disabled={!isWeak}> - </button>
         {translate(mind).name} (+{simpleFixed(mind.truePower * 100, 2)}%) x {mindEyes[mind.key]}
-        <button on:click={() => (mindEyes[mind.key] += mindEyes[mind.key] < 2)} disabled={!isWeak}> + </button>
+        <button onclick={() => (mindEyes[mind.key] += mindEyes[mind.key] < 2)} disabled={!isWeak}> + </button>
       </div>
     {/each}
   </div>
@@ -716,9 +711,9 @@
     {#each allFragiles as fragile (fragile.key)}
       {((fragiles[fragile.key] ??= 0), '')}
       <div>
-        <button on:click={() => (fragiles[fragile.key] -= fragiles[fragile.key] > 0)} disabled={!isWeak}> - </button>
+        <button onclick={() => (fragiles[fragile.key] -= fragiles[fragile.key] > 0)} disabled={!isWeak}> - </button>
         {translate(fragile).name} (+{simpleFixed(fragile.truePower * 100, 2)}%) x {fragiles[fragile.key]}
-        <button on:click={() => (fragiles[fragile.key] += fragiles[fragile.key] < 2)} disabled={!isWeak}> + </button>
+        <button onclick={() => (fragiles[fragile.key] += fragiles[fragile.key] < 2)} disabled={!isWeak}> + </button>
       </div>
     {/each}
   </div>
@@ -728,9 +723,9 @@
     {#each allFunnels as funnel (funnel.key)}
       {((funnels[funnel.key] ??= 0), '')}
       <div>
-        <button on:click={() => (funnels[funnel.key] -= funnels[funnel.key] > 0)}> - </button>
+        <button onclick={() => (funnels[funnel.key] -= funnels[funnel.key] > 0)}> - </button>
         {translate(funnel).name} (+{simpleFixed(funnel.truePower * 100, 2)}%) x {funnels[funnel.key]}
-        <button on:click={() => (funnels[funnel.key] += funnels[funnel.key] < 2)}> + </button>
+        <button onclick={() => (funnels[funnel.key] += funnels[funnel.key] < 2)}> + </button>
       </div>
     {/each}
   </div>

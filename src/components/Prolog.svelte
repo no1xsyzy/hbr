@@ -5,11 +5,11 @@
   import { styles, skills, characters } from '../lib/data.ts'
   import { translate } from '../lib/translate.ts'
 
-  export let storeKey
+  let { storeKey } = $props()
 
-  let query = presets[0].query
-  let cols = presets[0].cols
-  let result = []
+  let query = $state(presets[0].query)
+  let cols = $state(presets[0].cols)
+  let result = $state([])
 
   const ser = () => JSON.stringify({ query, cols, result })
   const des = (storedString) =>
@@ -24,21 +24,26 @@
   onDestroy(() => {
     window.removeEventListener('storage', listener)
   })
-  $: des(localStorage[storeKey] ?? '{}')
-  $: localStorage[storeKey] = JSON.stringify({ query, cols, result })
+  $effect(() => {
+    des(localStorage[storeKey] ?? '{}')
+  })
+  $effect(() => {
+    localStorage[storeKey] = ser()
+  })
 
-  let status: 'idle' | 'running' | 'terminating' | 'terminated' | 'finished' | 'limit' | ['error', string] = 'idle'
+  let status: 'idle' | 'running' | 'terminating' | 'terminated' | 'finished' | 'limit' | ['error', string] =
+    $state('idle')
 
-  $: running = status === 'running' || status === 'terminating'
+  let running = $derived(status === 'running' || status === 'terminating')
 
-  let defined_cols = []
-  let sorter = []
-  let headers = {}
+  // let defined_cols = $state([])
+  // let sorter = $state([])
+  // let headers = $state({})
 
-  $: {
-    const tmp_sorter = []
-    const tmp_headers = {}
-    const tmp_defined_cols = []
+  let [defined_cols, sorter, headers] = $derived.by(() => {
+    const defined_cols = []
+    const sorter = []
+    const headers = {}
     for (let col of cols.split('\n')) {
       try {
         col = col.trim()
@@ -49,40 +54,42 @@
         for (const config of configs) {
           if (['icon', 'name', 'icon_and_name', 'number', 'percentage', 'hidden', 'text', 'auto'].includes(config)) {
             defined = true
-            tmp_defined_cols.push([key, config])
+            defined_cols.push([key, config])
           } else if (/^sort_/.exec(config)) {
             const [_, dir, priority] = /^sort_(asc|desc)_(\d+)/.exec(config)
-            tmp_sorter.push([priority, key, dir])
+            sorter.push([priority, key, dir])
           } else if (/^h=/.exec(config)) {
             const [_, header] = /^h=(.+)/.exec(config)
-            tmp_headers[key] = header
+            headers[key] = header
           } else {
             console.warn(`unknown config '${config}'`)
           }
         }
-        if (!defined) tmp_defined_cols.push([key, 'auto'])
+        if (!defined) defined_cols.push([key, 'auto'])
       } catch {
         continue
       }
     }
-    defined_cols = tmp_defined_cols
-    sorter = tmp_sorter.sort((x, y) => x[0] - y[0])
-    headers = tmp_headers
-  }
-
-  $: extra_cols = [...new Set(result.flatMap((row) => Object.keys(row)))]
-    .filter((key) => defined_cols.find((c) => c[0] === key) === undefined)
-    .map((key) => [key, 'text'])
-
-  $: all_cols = [...defined_cols, ...extra_cols]
-
-  $: sorted_result = [...result].sort((x, y) => {
-    for (let [_, key, dir] of sorter) {
-      if (x[key] < y[key]) return 1 - 2 * +(dir == 'asc') // true = -1 ; false = 1
-      if (x[key] > y[key]) return 2 * +(dir == 'asc') - 1 // true = 1 ; false = -1
-    }
-    return 0
+    return [defined_cols, sorter.sort((x, y) => x[0] - y[0]), headers]
   })
+
+  let extra_cols = $derived(
+    [...new Set(result.flatMap((row) => Object.keys(row)))]
+      .filter((key) => defined_cols.find((c) => c[0] === key) === undefined)
+      .map((key) => [key, 'text']),
+  )
+
+  let all_cols = $derived([...defined_cols, ...extra_cols])
+
+  let sorted_result = $derived(
+    [...result].sort((x, y) => {
+      for (let [_, key, dir] of sorter) {
+        if (x[key] < y[key]) return 1 - 2 * +(dir == 'asc') // true = -1 ; false = 1
+        if (x[key] > y[key]) return 2 * +(dir == 'asc') - 1 // true = 1 ; false = -1
+      }
+      return 0
+    }),
+  )
 
   const iconFromStyleLabel = (label) => styles.find((st) => st.label === label)?.image ?? ''
   const iconFromSkillLabel = (label) => skills.find((sk) => sk.label === label)?.image ?? ''
@@ -123,12 +130,6 @@
     if (running) {
       return
     }
-    const ticket = {}
-    let t = ticket
-    onDestroy(() => {
-      if (t === ticket) status = 'terminating'
-    })
-    console.log('正在计算……')
     result = []
     status = 'running'
     doQuery(
@@ -165,7 +166,6 @@
           env.rows = []
         },
         cbend(reason, env) {
-          t = {}
           switch (reason) {
             case 'end':
               status = 'finished'
@@ -192,7 +192,7 @@
   预设：
   {#each presets as preset}
     <button
-      on:click={() => {
+      onclick={() => {
         query = preset.query
         cols = preset.cols
       }}>{preset.name}</button
@@ -203,7 +203,7 @@
 <form class="input">
   <textarea
     bind:value={query}
-    on:keydown={(e) => {
+    onkeydown={(e) => {
       if (e.keyCode == 13 && e.ctrlKey) ddd()
     }}
     spellcheck="false"
@@ -211,7 +211,7 @@
 
   <textarea
     bind:value={cols}
-    on:keydown={(e) => {
+    onkeydown={(e) => {
       if (e.keyCode == 13 && e.ctrlKey) ddd()
     }}
     spellcheck="false"
@@ -219,13 +219,13 @@
 
   <button
     disabled={running}
-    on:click={(e) => {
+    onclick={(e) => {
       ddd()
     }}>开始计算</button
   >
   <button
     disabled={!running}
-    on:click={(e) => {
+    onclick={(e) => {
       status = 'terminating'
     }}>中止计算</button
   >
