@@ -4,6 +4,7 @@
   import pl from '../lib/tau-prolog.ts'
   import { styles, skills, characters } from '../lib/data.ts'
   import { translate } from '../lib/translate.ts'
+  import shellParse from 'shell-quote/parse'
 
   let { storeKey } = $props()
 
@@ -49,9 +50,8 @@
         col = col.trim()
         if (!col) continue
         const [_, key, c] = /(.+?):\s*(.*)/.exec(col)
-        const configs = c.split(/\s+/)
         let defined = false
-        for (const config of configs) {
+        for (const config of shellParse(c)) {
           if (['icon', 'name', 'icon_and_name', 'number', 'percentage', 'hidden', 'text', 'auto'].includes(config)) {
             defined = true
             defined_cols.push([key, config])
