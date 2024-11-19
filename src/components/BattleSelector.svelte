@@ -1,5 +1,5 @@
 <script>
-  import { battles, score_attack, ACNames, CCNames, 国服高分, 当前国服置顶, BattleNames } from '../lib/data.ts'
+  import { battles, score_attack, bScoreAttacks, bTopped, bBattleNames } from '../lib/data.ts'
   import { translateType, segip } from '../lib/utils.ts'
 
   let { setenemies } = $props()
@@ -152,7 +152,7 @@
     let g = []
     for (let battle of battles) {
       if (p(battle)) {
-        g.push({ battle, type: 'normal', rating: 100 + 当前国服置顶.includes(battle.label) * 10 })
+        g.push({ battle, type: 'normal', rating: 100 + bTopped.includes(battle.label) * 10 })
       }
     }
 
@@ -161,7 +161,7 @@
         g.push({
           battle,
           type: 'score_attack',
-          rating: 100 + 当前国服置顶.includes(battle.label) * 10,
+          rating: 100 + bTopped.includes(battle.label) * 10,
         })
       }
     }
@@ -180,14 +180,14 @@
   }
 
   const friendlyNames = (label) => {
-    if (label in BattleNames) {
-      return [BattleNames[label], label]
+    if (label in bBattleNames) {
+      return [bBattleNames[label], label]
     }
 
     let match
     if (/scoreAttack(\d+)/.test(label)) {
       let fns = [label.replace(/scoreAttack(.+)/, 'W服高分第$1期')]
-      let g = 国服高分[label]
+      let g = bScoreAttacks[label]
       if (g !== undefined) {
         fns.push('B服高分第' + g + '期')
       }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { styles, B服实装 } from '../lib/data.ts'
+  import { styles, bInstall } from '../lib/data.ts'
 
   import * as echarts from 'echarts'
   let { storeKey, active } = $props()

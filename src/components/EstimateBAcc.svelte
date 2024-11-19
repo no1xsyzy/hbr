@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as echarts from 'echarts'
 
-  import { styles, B服实装 } from '../lib/data.ts'
+  import { styles, bInstall } from '../lib/data.ts'
   import type { Style } from '../lib/types.ts'
   import { translate } from '../lib/translate.ts'
 
@@ -130,7 +130,7 @@
     ],
   }
 
-  let bili = datasetFromMap(B服实装)
+  let bili = datasetFromMap(bInstall)
   let wfs = datasetFromMap(mapDFromStyles(styles))
 
   function draw_line(point_of, from, to, interval) {

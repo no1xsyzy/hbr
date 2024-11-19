@@ -608,3 +608,6 @@ export type ScoreAttackList = ScoreAttack[]
 export type BattleList = Battle[]
 
 export type SimpleTranslate = { [k: string]: string }
+
+export type Ser = () => string
+export type Des = (s: string) => void
