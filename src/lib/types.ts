@@ -494,10 +494,12 @@ export interface Enemy {
   }
   resist: Resist[]
 }
+
 export interface Battle {
   label: string
   enemy_list: Enemy[]
 }
+
 export interface ScoreAttackRuleBase {
   id: number
   label: string
@@ -505,6 +507,7 @@ export interface ScoreAttackRuleBase {
   desc: string
   grade: number
 }
+
 export type CommandPattern = {
   id: number
   order: number
@@ -513,38 +516,45 @@ export type CommandPattern = {
   target_weight: []
   skill_list: string[]
 }[]
+
 /** 将敌人行动修改为 *extra* */
 export interface ScoreAttackRuleCommandPattern extends ScoreAttackRuleBase {
   type: 'CommandPattern'
   extra: CommandPattern[]
 }
+
 /** 在 *arg* 层 OverDrive 前不能使用 */
 export interface ScoreAttackRuleLimitMinOverDriveLv extends ScoreAttackRuleBase {
   type: 'LimitMinOverDriveLv'
   arg: number
 }
+
 /** 限制 *roles* （如为 `null` 则针对所有角色）使用技能次数为 *arg* */
 export interface ScoreAttackRuleLimitSkillByUsedCount extends ScoreAttackRuleBase {
   type: 'LimitSkillByUsedCount'
   roles: Role[] | null
   arg: number
 }
+
 /** 限制回合数到 *arg* */
 export interface ScoreAttackRuleLimitTurnCount extends ScoreAttackRuleBase {
   type: 'LimitTurnCount'
   arg: number
 }
+
 /** 使 *target* 的 DP 改变 *arg*% */
 export interface ScoreAttackRuleMaxDpRate extends ScoreAttackRuleBase {
   type: 'MaxDpRate'
   target: 'Enemy' | 'Member'
   arg: number
 }
+
 /** 敌人的 HP+*arg*% */
 export interface ScoreAttackRuleMaxHpRate extends ScoreAttackRuleBase {
   type: 'MaxHpRate'
   arg: number
 }
+
 /** 根据 *timing* 对 *target* 施加 *parts* */
 export interface ScoreAttackRuleSkillPart extends ScoreAttackRuleBase {
   type: 'SkillPart'
@@ -553,6 +563,7 @@ export interface ScoreAttackRuleSkillPart extends ScoreAttackRuleBase {
   parts: NormalParts
   interval: number
 }
+
 export type ScoreAttackRule =
   | ScoreAttackRuleCommandPattern
   | ScoreAttackRuleLimitMinOverDriveLv
@@ -561,6 +572,7 @@ export type ScoreAttackRule =
   | ScoreAttackRuleMaxDpRate
   | ScoreAttackRuleMaxHpRate
   | ScoreAttackRuleSkillPart
+
 export interface ScoreAttack {
   label: string
   desc: string

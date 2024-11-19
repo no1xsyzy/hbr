@@ -93,15 +93,6 @@
 
   let apparentTeam
 
-  // $: states = moves.reduce(
-  //   (states, action) => {
-  //     const lastState = states.slice(-1)
-  //     const nextState = { action } //
-  //     return [...states, nextState]
-  //   },
-  //   [initialState],
-  // ) //...
-
   const maxBreakthrough = (style) => {
     if (typeof style === 'string') style = styles.find((s) => s.label === style)
     return Math.max(...style.limit_break.bonus_per_level.map((b) => b.step))

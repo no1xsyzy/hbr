@@ -14,8 +14,6 @@ style_can_use_skill(Style, Skill) :-
   chara_style(Chara, Style),
   once((Style == Style2; skill_not_ex(Skill); generalize(Skill))).
 
-% has_skill(Style, Skill) :- has_skill(Style, SkillN), skill_part(SkillN, _, Part), has_skill(Part, Skill).
-
 sub_skill(Skill, SubSkill) :-
   skill_part(Skill, _, Part), rec_has_skill(Part, Skill).
 
