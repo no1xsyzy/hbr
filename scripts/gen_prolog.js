@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /* global console */
 import { mkdirSync, readFileSync, writeFileSync } from 'fs'
+import check_gen from './check_gen.js'
 
-// main
 const data = []
 
 export function is_part_nested(part) {
@@ -48,7 +48,7 @@ function addSkillRecursive(parentToken, skill) {
   for (const part of skill.parts) {
     counter[part.skill_type] = (counter[part.skill_type] ?? 0) + 1
     const partToken =
-      counter[part.skill_type] == 1
+      counter[part.skill_type] === 1
         ? `Skill.${skill.label}/Part.${part.skill_type}`
         : `Skill.${skill.label}/Part.${part.skill_type}+${counter[part.skill_type]}`
     // if (counter[part.skill_type] > 1) console.warn(`Skill.${skill.label} has more than one Part.${part.skill_type}`)
@@ -79,9 +79,6 @@ function addSkillRecursive(parentToken, skill) {
         addSkillRecursive(partToken, subskill)
       }
     }
-    // if (part.skill_type === 'AttackSkill' || part.skill_type === 'TokenAttack') {
-    //   addStatement(`skill_attack_power('Skill.${skill.label}', ${part.power[1]}).`)
-    // }
   }
 }
 
@@ -130,11 +127,16 @@ function addStyle(style) {
   }
 }
 
-const styles = JSON.parse(readFileSync('./data_hbr/styles.json', 'utf-8'))
+const fromfile = './data_hbr/styles.json'
+const tofile = './data_gen/hbr.pl'
 
-for (const style of styles) {
-  addStyle(style)
+if (check_gen({ froms: [fromfile], tos: [tofile] })) {
+  const styles = JSON.parse(readFileSync(fromfile, 'utf-8'))
+
+  for (const style of styles) {
+    addStyle(style)
+  }
+
+  mkdirSync('./data_gen', { recursive: true })
+  writeFileSync(tofile, data.join('\n'), 'utf-8')
 }
-
-mkdirSync('./data_gen', { recursive: true })
-writeFileSync('./data_gen/hbr.pl', data.join('\n'), 'utf-8')

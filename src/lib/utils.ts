@@ -233,7 +233,6 @@ function filterOneCond(style: Style, cond: string) {
       return style.elements.includes('Light')
     case cond === 'dark':
       return style.elements.includes('Dark')
-      break
     case cond === 'noelement':
       return style.elements.length === 0
 

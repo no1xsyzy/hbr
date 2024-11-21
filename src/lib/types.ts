@@ -413,6 +413,7 @@ export interface Skill {
 }
 
 export interface Style {
+  id: number
   label: string
   chara_label: string
   type: SType
