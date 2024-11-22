@@ -18,13 +18,38 @@
 ### 3、开发模式直接用
 安装 node 和 yarn
 ```sh
-$ git clone
+$ git clone https://github.com/no1xsyzy/hbr.git
+$ cd hbr
 $ yarn
 $ cp sessdata.example.json && vi sessdata.json # 从官方『入队培训手册』中提取 cookies
-$ node scripts/update_hbr.js
-$ node scripts/update_bili.js
-$ node scripts/gen_prolog.js
-$ node scripts/gen_translate.js
-$ node scripts/validate.js # 如果要验证一下是否存在新的类型的数据的话
+$ node ./scripts/update_hbr.js
+$ node ./scripts/update_bili.js
+$ node ./scripts/generate.js
+$ node ./scripts/validate.js # 如果要验证一下是否存在新的类型的数据的话
 $ yarn dev
+```
+
+## 文件结构
+
+```
+.
+|-- data_hbr      # hbr.quest 数据（克隆时不存在）
+|-- data_bili     # 国服特定数据（克隆时不存在）
+|-- data_gen      # 预处理过的数据（克隆时不存在）
+|-- dist          # build 输出目录（克隆时不存在）
+|-- public        # 公共资源
+|   |-- hbr       # hbr本身的资源（克隆时不存在）
+|   `-- symbol    # 一些符号
+|-- scripts       # 抓取、预处理脚本
+|-- src           # 主程序代码
+|   |-- components         # svelte 组件
+|   |   `-- Pager.svelte   # 分页器，添加新页面需要修改它
+|   `-- lib
+|       |-- main.pl        # Prolog 使用的默认初始化
+|       `-- databili.toml  # 国服不可抓取的信息（手工维护）
+|-- index.html    # 入口网页
+|-- notes.md      # 一些笔记
+|-- Readme.md     # 自述文件（就是你在看的这个）
+|-- sessdata.json # 需要填入国服入队培训手册的对应cookie来正确获取信息（克隆时不存在）
+`-- sessdata.example.json # 上面这个文件的模板
 ```
