@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { createDatabase } from '../lib/sql.ts'
-
-  import { codemirror } from '@neocodemirror/svelte'
+  import CodeMirror from 'svelte-codemirror-editor'
   import { sql } from '@codemirror/lang-sql'
   import { onDestroy } from 'svelte'
+
+  import { createDatabase } from '../lib/sql.ts'
 
   let db = createDatabase()
 
@@ -15,8 +15,7 @@
   let limit = $state(5000)
 
   const ser = () => JSON.stringify({ query, limit })
-  const des = (storedString) =>
-    ({ query = DEFAULT_SQL, limit = 5000 } = JSON.parse(storedString))
+  const des = (storedString) => ({ query = DEFAULT_SQL, limit = 5000 } = JSON.parse(storedString))
 
   const listener = (event) => {
     if (event.key === storeKey && event.newValue !== null) {
@@ -44,24 +43,23 @@
       return [false, e.toString()]
     }
   })
-
 </script>
 
-<div use:codemirror={{value: query, lang: sql()}} on:codemirror:textChange={({detail:value})=>query=value}></div>
+<CodeMirror bind:value={query} lang={sql()} />
 
-<br>
+<br />
 {#if ok}
   Total: {result.length} results
-  <br>
+  <br />
   <table>
     <tbody>
-    {#each result as r}
-      <tr>
-        {#each r as c}
-          <td>{c}</td>
-        {/each}
-      </tr>
-    {/each}
+      {#each result as r}
+        <tr>
+          {#each r as c}
+            <td>{c}</td>
+          {/each}
+        </tr>
+      {/each}
     </tbody>
   </table>
 {:else}
@@ -79,6 +77,6 @@
   }
 
   div.error {
-    color: red
+    color: red;
   }
 </style>
