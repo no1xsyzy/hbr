@@ -19,6 +19,7 @@ const UPDATE_FILES = [
   { file: 'score_attack.json', images: [] },
   { file: 'events.json', images: ['logo', 'image'] },
   { file: 'latest.json', images: [] },
+  { file: 'masterSkills.json', images: [] },
 ]
 
 const IMG_HOST = 'https://www.hbr.quest/hbr'

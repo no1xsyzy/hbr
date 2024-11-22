@@ -86,6 +86,7 @@ export interface Effect {
 
 export type SkillTypeIndentifier =
   // AdditionalHitOn*
+  | 'AdditionalHitOnAttacked'
   | 'AdditionalHitOnBreaking'
   | 'AdditionalHitOnExtraSkill'
   | 'AdditionalHitOnKill'
@@ -97,6 +98,7 @@ export type SkillTypeIndentifier =
   | 'SkillSwitch'
   // Normal Parts
   | 'AdditionalTurn'
+  | 'AllStatusUpValue'
   | 'ArrowCherryBlossoms'
   | 'AttackByOwnDpRate'
   | 'AttackBySp'
@@ -106,6 +108,7 @@ export type SkillTypeIndentifier =
   | 'AttackUp'
   | 'AttackUpIncludeNormal'
   | 'AttackUpPerToken'
+  | 'Babied'
   | 'BreakDownTurnUp'
   | 'BreakGuard'
   | 'BuffCharge'
@@ -143,9 +146,11 @@ export type SkillTypeIndentifier =
   | 'HealDpRate'
   | 'HealSkillUsedCount'
   | 'HealSp'
+  | 'HealSpOnPreTurn'
   | 'HealSpRandom'
   | 'ImprisonRandom'
   | 'Invincible'
+  | 'MemorySpirit'
   | 'MindEye'
   | 'Misfortune'
   | 'Morale'
@@ -165,6 +170,7 @@ export type SkillTypeIndentifier =
   | 'Restraint'
   | 'ReviveDp'
   | 'ReviveDpRate'
+  | 'RiceFieldZone'
   | 'SelfDamage'
   | 'ShadowClone'
   | 'SkillLimitCountUp'
@@ -220,6 +226,7 @@ export type SkillPartWithStrval<x> = SkillPartBase & NoCond & NoSstl & StrvalSki
 export type SkillPartWithStrvalEnemyTag<x> = SkillPartBase & NoCond & NoSstl & StrvalEnemyTag & { skill_type: x }
 
 // AdditionalHitOn*
+export type AdditionalHitOnAttacked = SkillPart0<'AdditionalHitOnAttacked'>
 export type AdditionalHitOnBreaking = SkillPart0<'AdditionalHitOnBreaking'>
 export type AdditionalHitOnExtraSkill = SkillPart0<'AdditionalHitOnExtraSkill'>
 export type AdditionalHitOnKill = SkillPart0<'AdditionalHitOnKill'>
@@ -231,6 +238,7 @@ export type SkillRandom = SkillPartWithStrval<'SkillRandom'>
 export type SkillSwitch = SkillPartWithStrval<'SkillSwitch'>
 // Normal Parts
 export type AdditionalTurn = SkillPart0<'AdditionalTurn'>
+export type AllStatusUpValue = SkillPart0<'AllStatusUpValue'>
 export type ArrowCherryBlossoms = SkillPart0<'ArrowCherryBlossoms'>
 export type AttackByOwnDpRate = SkillPart0<'AttackByOwnDpRate'>
 export type AttackBySp = SkillPart0<'AttackBySp'>
@@ -240,6 +248,7 @@ export type AttackSkill = SkillPart0<'AttackSkill'>
 export type AttackUp = SkillPart0<'AttackUp'>
 export type AttackUpIncludeNormal = SkillPart0<'AttackUpIncludeNormal'>
 export type AttackUpPerToken = SkillPart0<'AttackUpPerToken'>
+export type Babied = SkillPart0<'Babied'>
 export type BreakDownTurnUp = SkillPart0<'BreakDownTurnUp'>
 export type BreakGuard = SkillPart0<'BreakGuard'>
 export type BuffCharge = SkillPart0<'BuffCharge'>
@@ -277,9 +286,11 @@ export type HealDpByDamage = SkillPart0<'HealDpByDamage'>
 export type HealDpRate = SkillPart0<'HealDpRate'>
 export type HealSkillUsedCount = SkillPart0<'HealSkillUsedCount'>
 export type HealSp = SkillPart0<'HealSp'>
+export type HealSpOnPreTurn = SkillPart0<'HealSpOnPreTurn'>
 export type HealSpRandom = SkillPart0<'HealSpRandom'>
 export type ImprisonRandom = SkillPart0<'ImprisonRandom'>
 export type Invincible = SkillPart0<'Invincible'>
+export type MemorySpirit = SkillPart0<'MemorySpirit'>
 export type MindEye = SkillPart0<'MindEye'>
 export type Misfortune = SkillPart0<'Misfortune'>
 export type Morale = SkillPart0<'Morale'>
@@ -299,6 +310,7 @@ export type ResistUp = SkillPart0<'ResistUp'>
 export type Restraint = SkillPart0<'Restraint'>
 export type ReviveDp = SkillPart0<'ReviveDp'>
 export type ReviveDpRate = SkillPart0<'ReviveDpRate'>
+export type RiceFieldZone = SkillPart0<'RiceFieldZone'>
 export type SelfDamage = SkillPart0<'SelfDamage'>
 export type ShadowClone = SkillPart0<'ShadowClone'>
 export type SkillLimitCountUp = SkillPart0<'SkillLimitCountUp'>
@@ -316,6 +328,7 @@ export type Zone = SkillPart0<'Zone'>
 export type ZoneUpEternal = SkillPart0<'ZoneUpEternal'>
 
 export type AdditionalHitPart =
+  | AdditionalHitOnAttacked
   | AdditionalHitOnBreaking
   | AdditionalHitOnExtraSkill
   | AdditionalHitOnKill
@@ -324,6 +337,7 @@ export type AdditionalHitPart =
 
 export type NormalPart =
   | AdditionalTurn
+  | AllStatusUpValue
   | ArrowCherryBlossoms
   | AttackByOwnDpRate
   | AttackBySp
@@ -333,6 +347,7 @@ export type NormalPart =
   | AttackUp
   | AttackUpIncludeNormal
   | AttackUpPerToken
+  | Babied
   | BreakDownTurnUp
   | BreakGuard
   | BuffCharge
@@ -370,9 +385,11 @@ export type NormalPart =
   | HealDpRate
   | HealSkillUsedCount
   | HealSp
+  | HealSpOnPreTurn
   | HealSpRandom
   | ImprisonRandom
   | Invincible
+  | MemorySpirit
   | MindEye
   | Misfortune
   | Morale
@@ -392,6 +409,7 @@ export type NormalPart =
   | Restraint
   | ReviveDp
   | ReviveDpRate
+  | RiceFieldZone
   | SelfDamage
   | ShadowClone
   | SkillLimitCountUp
@@ -658,11 +676,20 @@ export interface Accessory {
   skill: Skill[]
 }
 
+export interface MasterSkill {
+  id: number
+  label: string
+  chara: string
+  chara_label: string
+  skill: Skill
+}
+
 export type StyleList = Style[]
 export type SkillList = Skill[]
 export type ScoreAttackList = ScoreAttack[]
 export type BattleList = Battle[]
 export type Accessories = Accessory[]
+export type MasterSkills = MasterSkill[]
 
 export type SimpleTranslate = { [k: string]: string }
 

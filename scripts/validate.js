@@ -3,6 +3,7 @@ const CHECKS = [
   ['StyleList', 'data_hbr/styles.json', []],
   ['ScoreAttackList', 'data_hbr/score_attack.json', []],
   ['Accessories', 'data_hbr/accessories.json', []],
+  ['MasterSkills', 'data_hbr/masterSkills.json', []],
 ]
 
 /* global console */
