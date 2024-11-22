@@ -6,6 +6,28 @@ export type Role = 'Attacker' | 'Breaker' | 'Debuffer' | 'Buffer' | 'Healer' | '
 export type Tier = 'A' | 'S' | 'SS'
 export type Resist = [SType | Element, number] | ['IgnorePenetration', true]
 
+export enum AbilityType {
+  CriticalRate = 'CriticalRate',
+  Dexterity = 'Dexterity',
+  Dp = 'Dp',
+  Generalize = 'Generalize',
+  Luck = 'Luck',
+  ParamAll = 'ParamAll',
+  PassiveSkill = 'PassiveSkill',
+  Power = 'Power',
+  PursuitRateSlash = 'PursuitRateSlash',
+  PursuitRateStab = 'PursuitRateStab',
+  PursuitRateStrike = 'PursuitRateStrike',
+  Skill = 'Skill',
+  SkillEvolution = 'SkillEvolution',
+  SkillGrowthAbility = 'SkillGrowthAbility',
+  SkillLimitBreak = 'SkillLimitBreak',
+  Sp = 'Sp',
+  Spirit = 'Spirit',
+  Toughness = 'Toughness',
+  Wisdom = 'Wisdom',
+}
+
 export interface Hit {
   id: number
   type: HitType
@@ -18,8 +40,12 @@ export interface Multipliers {
   dr: number
 }
 
-export interface WithStrval {
+export interface StrvalSkill {
   strval: Skill[]
+}
+
+export interface StrvalEnemyTag {
+  strval: [string, -1]
 }
 
 export interface NoStrval {
@@ -96,10 +122,12 @@ export type SkillTypeIndentifier =
   | 'DebuffGuard'
   | 'DefenseDown'
   | 'DefenseUp'
+  | 'DefenseUpFromEnemyGroup'
   | 'DefenseUpPerToken'
   | 'DoubleActionExtraSkill'
   | 'EternalOath'
   | 'FightingSpirit'
+  | 'FixedHpDamageRate'
   | 'FixedHpDamageRateAttack'
   | 'Fragile'
   | 'Funnel'
@@ -187,8 +215,9 @@ export interface SkillPartBase {
 export type SkillPart0<x> = SkillPartBase & NoCond & NoSstl & NoStrval & { skill_type: x }
 export type SkillPartWithCond<x> = SkillPartBase & WithCond & NoSstl & NoStrval & { skill_type: x }
 export type SkillPartWithSstl<x> = SkillPartBase & NoCond & WithSstl & NoStrval & { skill_type: x }
-export type SkillPartWithCondStrval<x> = SkillPartBase & WithCond & NoSstl & WithStrval & { skill_type: x }
-export type SkillPartWithStrval<x> = SkillPartBase & NoCond & NoSstl & WithStrval & { skill_type: x }
+export type SkillPartWithCondStrval<x> = SkillPartBase & WithCond & NoSstl & StrvalSkill & { skill_type: x }
+export type SkillPartWithStrval<x> = SkillPartBase & NoCond & NoSstl & StrvalSkill & { skill_type: x }
+export type SkillPartWithStrvalEnemyTag<x> = SkillPartBase & NoCond & NoSstl & StrvalEnemyTag & { skill_type: x }
 
 // AdditionalHitOn*
 export type AdditionalHitOnBreaking = SkillPart0<'AdditionalHitOnBreaking'>
@@ -227,10 +256,12 @@ export type DamageSp = SkillPart0<'DamageSp'>
 export type DebuffGuard = SkillPart0<'DebuffGuard'>
 export type DefenseDown = SkillPart0<'DefenseDown'>
 export type DefenseUp = SkillPart0<'DefenseUp'>
+export type DefenseUpFromEnemyGroup = SkillPartWithStrvalEnemyTag<'DefenseUpFromEnemyGroup'>
 export type DefenseUpPerToken = SkillPart0<'DefenseUpPerToken'>
 export type DoubleActionExtraSkill = SkillPart0<'DoubleActionExtraSkill'>
 export type EternalOath = SkillPart0<'EternalOath'>
 export type FightingSpirit = SkillPart0<'FightingSpirit'>
+export type FixedHpDamageRate = SkillPart0<'FixedHpDamageRate'>
 export type FixedHpDamageRateAttack = SkillPart0<'FixedHpDamageRateAttack'>
 export type Fragile = SkillPart0<'Fragile'>
 export type Funnel = SkillPart0<'Funnel'>
@@ -318,10 +349,12 @@ export type NormalPart =
   | DebuffGuard
   | DefenseDown
   | DefenseUp
+  | DefenseUpFromEnemyGroup
   | DefenseUpPerToken
   | DoubleActionExtraSkill
   | EternalOath
   | FightingSpirit
+  | FixedHpDamageRate
   | FixedHpDamageRateAttack
   | Fragile
   | Funnel
@@ -377,7 +410,7 @@ export type NormalPart =
 
 export type NestedPart = SkillRandom | SkillCondition | SkillSwitch
 
-export type Part = NormalPart | NestedPart
+export type Part = AdditionalHitPart | NormalPart | NestedPart
 
 export type NormalParts = NormalPart[]
 export type NestedParts = [NestedPart]
@@ -438,10 +471,10 @@ export interface Style {
 
 export interface Ability {
   category: 'Ability'
-  type: string
-  value_type: string
+  type: AbilityType
+  value_type: 'Addition' | 'Ratio' | 'RealNumber'
   value: [number, number]
-  skill: number | null
+  skill: number | null | Skill | PassiveWithParts
   is_exclusive?: boolean
 }
 
@@ -593,10 +626,10 @@ export interface ScoreAttack {
       /** break rate */ d: [number, number]
       /** resist */ r: Resist[]
     } | null)[]
-    /** border line */ rbl: number[]
-    /** dp line */ dl: number[]
-    /** hp line */ hl: number[]
-    /** attack rate line */ al: number[]
+    /** line for border */ rbl: number[]
+    /** line for dp */ dl: number[]
+    /** line for hp */ hl: number[]
+    /** line for attack rate */ al: number[]
     /** damage bonus cap */ db: number
     /** difficulty score */ ds: number
     /** no break bonus */ nbb: number
@@ -615,10 +648,21 @@ export interface Translation {
   }
 }
 
+export interface Accessory {
+  id: number
+  label: string
+  image: string
+  name: string
+  text: string
+  effects: Ability[]
+  skill: Skill[]
+}
+
 export type StyleList = Style[]
 export type SkillList = Skill[]
 export type ScoreAttackList = ScoreAttack[]
 export type BattleList = Battle[]
+export type Accessories = Accessory[]
 
 export type SimpleTranslate = { [k: string]: string }
 

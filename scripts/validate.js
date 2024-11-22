@@ -2,6 +2,7 @@ const CHECKS = [
   ['SkillList', 'data_hbr/skills.json', []],
   ['StyleList', 'data_hbr/styles.json', []],
   ['ScoreAttackList', 'data_hbr/score_attack.json', []],
+  ['Accessories', 'data_hbr/accessories.json', []],
 ]
 
 /* global console */
@@ -9,6 +10,7 @@ import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import * as TJS from 'typescript-json-schema'
 import { Validator } from 'jsonschema'
+
 /**
  * @type {TJS.PartialArgs}
  */

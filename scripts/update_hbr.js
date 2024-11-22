@@ -18,6 +18,7 @@ const UPDATE_FILES = [
   { file: 'battles.json', images: [] },
   { file: 'score_attack.json', images: [] },
   { file: 'events.json', images: ['logo', 'image'] },
+  { file: 'latest.json', images: [] },
 ]
 
 const IMG_HOST = 'https://www.hbr.quest/hbr'
@@ -36,6 +37,7 @@ async function readLastModified() {
 
   return {}
 }
+
 async function writeLastModified(d) {
   writeFileSync(LAST_MODIFIED_FILE, JSON.stringify(d, null, 2), 'utf-8')
 }
@@ -57,7 +59,7 @@ async function main() {
         headers,
         responseType: 'json',
         validateStatus: function (status) {
-          return (status >= 200 && status < 300) || status == 304
+          return (status >= 200 && status < 300) || status === 304
         },
       })
     } catch (error) {
