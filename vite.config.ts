@@ -24,4 +24,9 @@ const hexLoader: Plugin = {
 export default defineConfig({
   base: '',
   plugins: [hexLoader, svelte(), ViteToml()],
+  esbuild: {
+    supported: {
+      'top-level-await': true,
+    },
+  },
 })
