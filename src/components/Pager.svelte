@@ -1,19 +1,19 @@
 <script>
+  import { onDestroy, tick } from 'svelte'
   import SimNuke from './SimNuke.svelte'
   import SimODSP from './SimODSP.svelte'
   import Prolog from './Prolog.svelte'
   import EstimateBAcc from './EstimateBAcc.svelte'
   import Sql from './Sql.svelte'
 
+  const ROOT_STORE_KEY = 'ROOT_STORE_KEY'
+
   let pages = $state([])
   let currentPageKey = $state(null)
   let pageCount = 0
 
-  $inspect('pages', pages)
-
   const ser = () => JSON.stringify({ pages, currentPageKey, pageCount })
-  const des = (storedString) =>
-    ({ pages = [], currentPageKey = null, pageCount = 0 } = JSON.parse(storedString))
+  const des = (storedString) => ({ pages = [], currentPageKey = null, pageCount = 0 } = JSON.parse(storedString))
 
   const listener = (event) => {
     if (event.key === ROOT_STORE_KEY && event.newValue !== null) {
@@ -59,15 +59,17 @@
         onclick={() => {
           pages.splice(i, 1)
           const storeKey = page.storeKey
-          tick().then(()=>{localStorage.removeItem(storeKey)})
+          tick().then(() => {
+            localStorage.removeItem(storeKey)
+          })
           if (current) {
             if (pages.length === 0) currentPageKey = null
             else if (pages.length === i) currentPageKey = pages.at(-1).key
             else currentPageKey = pages[i].key
           }
-        }}>x
-      </button
-      >
+        }}
+      >x
+      </button>
     </div>
   {/each}
   <!-- <div class="padding"></div> -->
