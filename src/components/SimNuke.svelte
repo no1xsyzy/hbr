@@ -147,13 +147,9 @@
     ownerParams: pt.ownerParams,
   })
 
-  $inspect('team', team)
-
   let apparentTeam = $derived(
     team.flatMap((pl, i) => (pl ? [{ style: styles.find((s) => s.label === pl), params: params[i] }] : [])),
   )
-
-  $inspect('apparentTeam', apparentTeam)
 
   let allSkills = $derived(
     apparentTeam
@@ -170,8 +166,6 @@
       }),
   )
 
-  $inspect('allSkills', allSkills)
-
   let allParts = $derived(
     allSkills.flatMap(function resolveNestedPartsFromSkill({ ownerParams, parts, name, label, hits, hit_count }) {
       if (parts[0].skill_type === 'SkillSwitch') {
@@ -187,20 +181,20 @@
         return parts.map((pt, i) => {
           return ATTACK_TYPES.includes(pt.skill_type)
             ? {
-                ...pt,
-                ownerParams,
-                name,
-                label,
-                key: label + '/' + i,
-                skHits: hits.length > 0 ? hits.map((h) => h.power_ratio) : Array(hit_count).fill(1 / hit_count),
-              }
+              ...pt,
+              ownerParams,
+              name,
+              label,
+              key: label + '/' + i,
+              skHits: hits.length > 0 ? hits.map((h) => h.power_ratio) : Array(hit_count).fill(1 / hit_count),
+            }
             : {
-                ...pt,
-                ownerParams,
-                name,
-                label,
-                key: label + '/' + i,
-              }
+              ...pt,
+              ownerParams,
+              name,
+              label,
+              key: label + '/' + i,
+            }
         })
       }
     }),
@@ -340,7 +334,7 @@
   }
 
   const injectZoneTruePower = (effect) => {
-    return { ...effect, truePower: effect.power }
+    return { ...effect, truePower: effect.power[0] }
   }
 
   let nuke = $state()
@@ -349,10 +343,13 @@
   $effect.pre(() => {
     const theNuke = allNukes.find((x) => x.label === nukeLabel)
     if (theNuke) {
-      nuke = injectNukeTruePower(theNuke)
-      const newExtraParamCfg = nuke?.extraParam ?? null
+      const injectedNuke = injectNukeTruePower(theNuke)
+      const newExtraParamCfg = injectedNuke?.extraParam ?? null
+      nuke = injectedNuke
       if (newExtraParamCfg === null) {
-        extraParam = null
+        if (extraParam !== null) {
+          extraParam = null
+        }
       } else {
         if (newExtraParamCfg.name !== extraParamCfg?.name) {
           extraParam = newExtraParamCfg.default
@@ -369,33 +366,33 @@
 
   const partFapper =
     (skill_type, truePowerInjector, { elemented = false, includeValue = false } = {}) =>
-    (pt) => {
-      if (pt.skill_type !== skill_type) return []
+      (pt) => {
+        if (pt.skill_type !== skill_type) return []
 
-      const element = translateType(pt.elements?.[0] ?? null)
-      if (elemented && element !== null && element !== attackElement) return []
+        const element = translateType(pt.elements?.[0] ?? null)
+        if (elemented && element !== null && element !== attackElement) return []
 
-      const type = translateType(pt.type)
-      if (elemented && type !== null && type !== attackType) return []
+        const type = translateType(pt.type)
+        if (elemented && type !== null && type !== attackType) return []
 
-      const effect = {
-        key: pt.key,
-        label: pt.label,
-        name: pt.name,
-        element,
-        type,
-        power: pt.power,
-        growth: pt.growth,
-        params: pt.parameters,
-        diff_for_max: pt.diff_for_max,
-        ownerParams: pt.ownerParams,
+        const effect = {
+          key: pt.key,
+          label: pt.label,
+          name: pt.name,
+          element,
+          type,
+          power: pt.power,
+          growth: pt.growth,
+          params: pt.parameters,
+          diff_for_max: pt.diff_for_max,
+          ownerParams: pt.ownerParams,
+        }
+        if (includeValue) {
+          effect.value = pt.value
+        }
+
+        return [truePowerInjector(effect)]
       }
-      if (includeValue) {
-        effect.value = pt.value
-      }
-
-      return [truePowerInjector(effect)]
-    }
 
   const byTruePower = (x, y) => y.truePower - x.truePower
 
@@ -434,7 +431,7 @@
   )
 
   let allZones = $derived(
-    allParts.flatMap(partFapper('Zone', injectBuffTruePower, { elemented: true })).sort(byTruePower),
+    allParts.flatMap(partFapper('Zone', injectZoneTruePower, { elemented: true })).sort(byTruePower),
   )
 
   const eNoEl = (xx) =>
@@ -449,13 +446,13 @@
   const eEl = (effects) =>
     Math.round(
       (eNoEl(effects.filter((x) => x.element === null)) + eNoEl(effects.filter((x) => x.element === attackElement))) *
-        10000,
+      10000,
     ) / 10000
 
   function makeX(allXs, simX) {
     const result = []
     for (const label in simX) {
-      result.push({ ...allXs.find((x) => x.label === label), stack: simX[label] })
+      result.push({ ...allXs.find((x) => x.key === label), stack: simX[label] })
     }
     return result
   }
@@ -465,8 +462,8 @@
       element === null
         ? [[...allXs].sort((x, y) => y.truePower - x.truePower)]
         : [(x) => x.element === null, (x) => x.element === element].map((flt) =>
-            allXs.filter(flt).sort((x, y) => y.truePower - x.truePower),
-          )
+          allXs.filter(flt).sort((x, y) => y.truePower - x.truePower),
+        )
     let totalPower = 0
     for (const sortedAllXs of sortedAllXss) {
       let stacking = 0
@@ -497,16 +494,23 @@
   )
   let eFragiles = $derived(isWeak ? eFromX(allFragiles, fragiles, null) + 1 : 1)
   let eMindEyes = $derived(isWeak ? eFromX(allMindEyes, mindEyes, null) + 1 : 1)
-  let eZone = $derived(allZones.find((z) => z.label === zone)?.truePower ?? 1)
+  let eZone = $derived(allZones.find((z) => z.key === zone)?.truePower ?? 1)
   let eBreak = $derived(breakRate / 100)
   let eFunnel = $derived(eFromX(allFunnels, funnels, null) + 1)
+
+  $inspect('allFunnels', allFunnels)
+  $inspect('funnels', funnels)
 
   let hits = $derived(
     nuke?.hits.concat(
       makeX(allFunnels, funnels)
+        .map(x => (console.log('AA', x), x))
         .sort((x, y) => y.truePower - x.truePower)
+        .map(x => (console.log('BB', x), x))
         .flatMap(({ stack, ...r }) => Array(stack).fill(r))
+        .map(x => (console.log('CC', x), x))
         .slice(0, 2)
+        .map(x => (console.log('DD', x), x))
         .flatMap((f) => Array(Math.max(...f.power)).fill(f.value[0])),
     ) ?? [],
   )
@@ -514,17 +518,17 @@
   let beforeFunnel = $derived(
     nuke !== null
       ? Math.round(
-          (isCritical ? nuke.truePowerCritical : nuke.truePower) *
-            (eExtra *
-              eAttackUps *
-              eDefenseDowns *
-              eCriticalDamageUps *
-              eFragiles *
-              eMindEyes *
-              eZone *
-              eBreak *
-              resistPlier),
-        )
+        (isCritical ? nuke.truePowerCritical : nuke.truePower) *
+        (eExtra *
+          eAttackUps *
+          eDefenseDowns *
+          eCriticalDamageUps *
+          eFragiles *
+          eMindEyes *
+          eZone *
+          eBreak *
+          resistPlier),
+      )
       : 0,
   )
 
@@ -566,7 +570,7 @@
     <div>技能选择</div>
     <div>
       <select bind:value={nukeLabel}>
-        <option value={null}> - </option>
+        <option value={null}> -</option>
         {#each allNukes as s, i (s.key)}
           <option value={s.label}>{translate(s).name}</option>
         {/each}
@@ -603,15 +607,26 @@
   <div class="cell aup" class:enabled={eAttackUps > 1}>
     <div>加攻 (x{simpleFixed(eAttackUps, 4)})</div>
     {#each allAttackUps as atkUp (atkUp.key)}
-      {((attackUps[atkUp.key] ??= 0), '')}
       <div>
-        <button onclick={() => (attackUps[atkUp.key] -= attackUps[atkUp.key] > 0)}> - </button>
+        <button
+          onclick={() => {
+            attackUps[atkUp.key] ??= 0
+            attackUps[atkUp.key] -= attackUps[atkUp.key] > 0
+          }}
+        >-
+        </button>
         <span>
           <Symbol symbol={atkUp.element} />
           {translate(atkUp).name}
           (+{simpleFixed(atkUp.truePower * 100, 2)}%) x {attackUps[atkUp.key] ?? 0}
         </span>
-        <button onclick={() => (attackUps[atkUp.key] += attackUps[atkUp.key] < 2)}> + </button>
+        <button
+          onclick={() => {
+            attackUps[atkUp.key] ??= 0
+            attackUps[atkUp.key] += attackUps[atkUp.key] < 2
+          }}
+        >+
+        </button>
       </div>
     {/each}
   </div>
@@ -619,15 +634,28 @@
   <div class="cell ddown" class:enabled={eDefenseDowns > 1}>
     <div>降防 (x{simpleFixed(eDefenseDowns, 4)})</div>
     {#each allDefDowns as defDown (defDown.key)}
-      {((defenseDowns[defDown.key] ??= 0), '')}
       <div>
-        <button onclick={() => (defenseDowns[defDown.key] -= defenseDowns[defDown.key] > 0)}> - </button>
+        <button
+          onclick={() => {
+            defenseDowns[defDown.key] ??= 0
+            defenseDowns[defDown.key] -= defenseDowns[defDown.key] > 0
+          }}
+        >
+          -
+        </button>
         <Symbol symbol={defDown.element} />
         <span>
           {translate(defDown).name}
           (+{simpleFixed(defDown.truePower * 100, 2)}%) x {defenseDowns[defDown.key] ?? 0}
         </span>
-        <button onclick={() => (defenseDowns[defDown.key] += defenseDowns[defDown.key] < 2)}> + </button>
+        <button
+          onclick={() => {
+            defenseDowns[defDown.key] ??= 0
+            defenseDowns[defDown.key] += defenseDowns[defDown.key] < 2
+          }}
+        >
+          +
+        </button>
       </div>
     {/each}
   </div>
@@ -638,15 +666,28 @@
       (x{simpleFixed(eCriticalDamageUps, 4)})
     </div>
     {#each allCriticalDamageUps as cDmgUp (cDmgUp.key)}
-      {((criticalDamageUps[cDmgUp.key] ??= 0), '')}
       <div>
-        <button onclick={() => (criticalDamageUps[cDmgUp.key] -= criticalDamageUps[cDmgUp.key] > 0)}> - </button>
+        <button
+          onclick={() => {
+            criticalDamageUps[cDmgUp.key] ??= 0
+            criticalDamageUps[cDmgUp.key] -= criticalDamageUps[cDmgUp.key] > 0
+          }}
+        >
+          -
+        </button>
         <span>
           <Symbol symbol={cDmgUp.element} forceNeoSymbol="1" />
           {translate(cDmgUp).name}
-          (+{simpleFixed(cDmgUp.truePower * 100, 2)}%) x {criticalDamageUps[cDmgUp.key]}
+          (+{simpleFixed(cDmgUp.truePower * 100, 2)}%) x {criticalDamageUps[cDmgUp.key] ?? 0}
         </span>
-        <button onclick={() => (criticalDamageUps[cDmgUp.key] += criticalDamageUps[cDmgUp.key] < 2)}> + </button>
+        <button
+          onclick={() => {
+            criticalDamageUps[cDmgUp.key] ??= 0
+            criticalDamageUps[cDmgUp.key] += criticalDamageUps[cDmgUp.key] < 2
+          }}
+        >
+          +
+        </button>
       </div>
     {/each}
   </div>
@@ -660,6 +701,7 @@
           <input type="radio" bind:group={zone} value={z.key} />
           <Symbol symbol={z.element} />
           {translate(z).name}
+          (x{z.truePower})
         </label>
       </div>
     {/each}
@@ -686,7 +728,9 @@
       </div>
 
       <div class="cell typeresist" class:enabled={resistTypPlier > 1}>
-        <div><div>武器克制 (x{resistTypPlier})</div></div>
+        <div>
+          <div>武器克制 (x{resistTypPlier})</div>
+        </div>
         {#each resistsTyp as r}
           <div>{r.type} {r.rate}</div>
         {/each}
@@ -697,11 +741,26 @@
   <div class="cell mind" class:enabled={eMindEyes > 1} class:disabled={!isWeak}>
     心眼 (x{eMindEyes})
     {#each allMindEyes as mind (mind.key)}
-      {((mindEyes[mind.key] ??= 0), '')}
       <div>
-        <button onclick={() => (mindEyes[mind.key] -= mindEyes[mind.key] > 0)} disabled={!isWeak}> - </button>
-        {translate(mind).name} (+{simpleFixed(mind.truePower * 100, 2)}%) x {mindEyes[mind.key]}
-        <button onclick={() => (mindEyes[mind.key] += mindEyes[mind.key] < 2)} disabled={!isWeak}> + </button>
+        <button
+          onclick={() => {
+            mindEyes[mind.key] ??= 0
+            mindEyes[mind.key] -= mindEyes[mind.key] > 0
+          }}
+          disabled={!isWeak}
+        >
+          -
+        </button>
+        {translate(mind).name} (+{simpleFixed(mind.truePower * 100, 2)}%) x {mindEyes[mind.key] ?? 0}
+        <button
+          onclick={() => {
+            mindEyes[mind.key] ??= 0
+            mindEyes[mind.key] += mindEyes[mind.key] < 2
+          }}
+          disabled={!isWeak}
+        >
+          +
+        </button>
       </div>
     {/each}
   </div>
@@ -709,11 +768,24 @@
   <div class="cell fragile" class:enabled={eFragiles > 1} class:disabled={!isWeak}>
     <div>脆弱 (x{eFragiles})</div>
     {#each allFragiles as fragile (fragile.key)}
-      {((fragiles[fragile.key] ??= 0), '')}
       <div>
-        <button onclick={() => (fragiles[fragile.key] -= fragiles[fragile.key] > 0)} disabled={!isWeak}> - </button>
-        {translate(fragile).name} (+{simpleFixed(fragile.truePower * 100, 2)}%) x {fragiles[fragile.key]}
-        <button onclick={() => (fragiles[fragile.key] += fragiles[fragile.key] < 2)} disabled={!isWeak}> + </button>
+        <button
+          onclick={() => {
+            fragiles[fragile.key] ??= 0
+            fragiles[fragile.key] -= fragiles[fragile.key] > 0
+          }}
+          disabled={!isWeak}
+        >-
+        </button>
+        {translate(fragile).name} (+{simpleFixed(fragile.truePower * 100, 2)}%) x {fragiles[fragile.key] ?? 0}
+        <button
+          onclick={() => {
+            fragiles[fragile.key] ??= 0
+            fragiles[fragile.key] += fragiles[fragile.key] < 2
+          }}
+          disabled={!isWeak}
+        >+
+        </button>
       </div>
     {/each}
   </div>
@@ -721,11 +793,24 @@
   <div class="cell funnel" class:enabled={eFunnel > 1}>
     连击 (x{eFunnel})
     {#each allFunnels as funnel (funnel.key)}
-      {((funnels[funnel.key] ??= 0), '')}
       <div>
-        <button onclick={() => (funnels[funnel.key] -= funnels[funnel.key] > 0)}> - </button>
-        {translate(funnel).name} (+{simpleFixed(funnel.truePower * 100, 2)}%) x {funnels[funnel.key]}
-        <button onclick={() => (funnels[funnel.key] += funnels[funnel.key] < 2)}> + </button>
+        <button
+          onclick={() => {
+            funnels[funnel.key] ??= 0
+            funnels[funnel.key] -= funnels[funnel.key] > 0
+          }}
+        >
+          -
+        </button>
+        {translate(funnel).name} (+{simpleFixed(funnel.truePower * 100, 2)}%) x {funnels[funnel.key] ?? 0}
+        <button
+          onclick={() => {
+            funnels[funnel.key] ??= 0
+            funnels[funnel.key] += funnels[funnel.key] < 2
+          }}
+        >
+          +
+        </button>
       </div>
     {/each}
   </div>
@@ -733,37 +818,37 @@
   <div class="cell totaldmg">
     <table class="dmgtable">
       <thead>
-        <tr>
-          <th class="td1">序</th>
-          <th class="td3">中值</th>
-          <th class="tdl"></th>
-          <th class="td3 tdm">下限</th>
-          <th class="tdm"></th>
-          <th class="td3 tdm">上限</th>
-          <th class="tdr"></th>
-        </tr>
+      <tr>
+        <th class="td1">序</th>
+        <th class="td3">中值</th>
+        <th class="tdl"></th>
+        <th class="td3 tdm">下限</th>
+        <th class="tdm"></th>
+        <th class="td3 tdm">上限</th>
+        <th class="tdr"></th>
+      </tr>
       </thead>
       <tbody>
-        {#each sDamageRange as [m, l, r], i}
-          <tr>
-            <td class="td1">{i + 1}</td>
-            <td class="td3">{m}</td>
-            <td class="tdl">(</td>
-            <td class="td3 tdm">{l}</td>
-            <td class="tdm">~</td>
-            <td class="td3 tdm">{r}</td>
-            <td class="tdr">)</td>
-          </tr>
-        {/each}
+      {#each sDamageRange as [m, l, r], i}
         <tr>
-          <td class="td1">总</td>
-          <td class="td3">{totalDmg}</td>
+          <td class="td1">{i + 1}</td>
+          <td class="td3">{m}</td>
           <td class="tdl">(</td>
-          <td class="td3 tdm">{totalDmgRange[0]}</td>
+          <td class="td3 tdm">{l}</td>
           <td class="tdm">~</td>
-          <td class="td3 tdm">{totalDmgRange[1]}</td>
+          <td class="td3 tdm">{r}</td>
           <td class="tdr">)</td>
         </tr>
+      {/each}
+      <tr>
+        <td class="td1">总</td>
+        <td class="td3">{totalDmg}</td>
+        <td class="tdl">(</td>
+        <td class="td3 tdm">{totalDmgRange[0]}</td>
+        <td class="tdm">~</td>
+        <td class="td3 tdm">{totalDmgRange[1]}</td>
+        <td class="tdr">)</td>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -778,6 +863,7 @@
     align-items: flex-start;
     align-content: flex-start;
   }
+
   .attr {
     width: 6ch;
   }
@@ -800,50 +886,63 @@
     grid-template-rows: auto auto auto auto auto;
     gap: 2px;
   }
+
   .damagegrid .cell.skill {
     grid-row: 1 / 4;
   }
+
   .damagegrid .cell.skill.hasextra {
     grid-row: 1 / 3;
   }
+
   .damagegrid .cell.extra {
     grid-row: 3 / 4;
   }
+
   .damagegrid .cell.aup {
     grid-row: 2 / 3;
     grid-column: 2 / 3;
   }
+
   .damagegrid .cell.ddown {
     grid-row: 3 / 4;
     grid-column: 2 / 3;
   }
+
   .damagegrid .cell.break {
     grid-row: 4 / 5;
     grid-column: 3 / 4;
   }
+
   .damagegrid .cell.funnel {
     grid-row: 4 / 5;
     grid-column: 2 / 3;
   }
+
   .damagegrid .cell.resist {
     grid-row: 1 / 2;
     grid-column: 3 / 4;
   }
+
   .damagegrid .cell.fragile {
     grid-row: 3 / 4;
     grid-column: 3 / 4;
   }
+
   .damagegrid .cell.mind {
     grid-row: 2 / 3;
     grid-column: 3 / 4;
   }
+
   .cell {
     min-height: 150px;
   }
+
   .cell.critical {
     grid-row: 1 / 2;
     grid-column: 2 / 3;
   }
+
   .cell.zone {
     grid-row: 4 / 5;
     grid-column: 1 / 2;
@@ -861,22 +960,28 @@
     border-color: black;
     background-color: lightgrey;
   }
+
   /* .cell.skill {background-color: grey} */
   .cell.aup.enabled {
     background-color: #feb2b2;
   }
+
   .cell.ddown.enabled {
     background-color: #9ae6b4;
   }
+
   .cell.critical.enabled {
     background-color: #faf089;
   }
+
   .cell.zone.enabled {
     background-color: #90cdf4;
   }
+
   .cell.break {
     background-color: #fbd38d;
   }
+
   .cell.resist {
     background-color: transparent;
     border-color: black;
@@ -884,24 +989,31 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: calc(1em + 13px) 1fr;
   }
+
   .cell.resist .title {
     grid-column: 1 / 3;
   }
+
   .cell.resist .elementresist.enabled {
     background-color: #faf089;
   }
+
   .cell.resist .typeresist.enabled {
     background-color: #d6bcfa;
   }
+
   .cell.fragile.enabled {
     background-color: #90cdf4;
   }
+
   .cell.mind.enabled {
     background-color: #feb2b2;
   }
+
   .cell.funnel.enabled {
     background-color: #92d9b8;
   }
+
   .cell.totaldmg {
     background-color: orange;
   }
@@ -921,14 +1033,17 @@
   .dmgtable {
     border-collapse: collapse;
   }
+
   .dmgtable td {
     border: solid;
     border-width: 1px;
     text-align: right;
   }
+
   .dmgtable td.td1 {
     width: 2ch;
   }
+
   .dmgtable td.td3 {
     width: 6ch;
   }
@@ -937,6 +1052,7 @@
   .dmgtable td.tdm {
     border-right: none;
   }
+
   .dmgtable td.tdr,
   .dmgtable td.tdm {
     border-left: none;
