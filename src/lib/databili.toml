@@ -62,6 +62,7 @@ scoreAttack30 = "10"
 # 31 = "BAD GIRLS DESTRUCTION"
 # 32 = "心優しき死神より"
 # 33 = "丸い幸せに祈りを込めて"
+# 34 = "うみとら冒険譚"
 
 # 联动活动译名
 [bCCNames]
@@ -125,11 +126,16 @@ from = 2024-11-20T13:00:00+08:00
 till = 2024-12-17T12:59:00+08:00
 title = "初冬纪念Step Up扭蛋"
 styles = [
-  'MSatsuki05', 'IcOhshima04',
-  'YIzumi05', 'MuOhshima03',
-  'LShanhua03', 'MdAngelis03',
-  'AKanzaki04', 'MSatsuki04',
-  'CSugahara04', 'FMikoto03',
+  'MSatsuki05',
+  'IcOhshima04',
+  'YIzumi05',
+  'MuOhshima03',
+  'LShanhua03',
+  'MdAngelis03',
+  'AKanzaki04',
+  'MSatsuki04',
+  'CSugahara04',
+  'FMikoto03',
 ]
 tags = ['必得SS', '付费Step']
 dynamic = "https://www.bilibili.com/opus/1000260083237519379"
