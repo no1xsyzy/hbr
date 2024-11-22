@@ -1,5 +1,7 @@
 /* global console */
 
+const CFG_FETCH_IMG = false
+
 import { readFileSync, existsSync, mkdirSync, writeFileSync, createWriteStream } from 'fs'
 import { access } from 'fs/promises'
 import { join } from 'path'
@@ -84,9 +86,8 @@ const getRoleList = async () => {
 const updateBili = async () => {
   const encoding = 'utf-8'
 
-  for (let path of [DATA_BILI, BILI_IMG]) {
-    mkdirSync(path, { recursive: true })
-  }
+  mkdirSync(DATA_BILI, { recursive: true })
+  if (CFG_FETCH_IMG) mkdirSync(BILI_IMG, { recursive: true })
 
   const roleList = await getRoleList()
   writeFileSync(`${DATA_BILI}/role_list.json`, JSON.stringify(roleList, null, 2), {
@@ -126,29 +127,31 @@ const updateBili = async () => {
   if (edited) writeFileSync(filePath, JSON.stringify(details, null, 2), { encoding })
 
   for (const role in details) {
-    const roleDetail = details[role]
-    await Promise.all(
-      ['box_icon', 'icon', 'strip_image'].map(async (imgType) => {
-        const source = roleDetail?.[imgType] ?? ''
-        const target = join(BILI_IMG, `${role}.${imgType}.png`)
-        if (!source.startsWith('https://')) return // not url, skip
-        try {
-          await access(target)
-          return // file exists, skip
-        } catch {
-          // file not exists, fetch
-          /* empty */
-        }
+    if (CFG_FETCH_IMG) {
+      const roleDetail = details[role]
+      await Promise.all(
+        ['box_icon', 'icon', 'strip_image'].map(async (imgType) => {
+          const source = roleDetail?.[imgType] ?? ''
+          const target = join(BILI_IMG, `${role}.${imgType}.png`)
+          if (!source.startsWith('https://')) return // not url, skip
+          try {
+            await access(target)
+            return // file exists, skip
+          } catch {
+            // file not exists, fetch
+            /* empty */
+          }
 
-        console.log(`fetching ${role} ${imgType}`)
-        const response = await axios({
-          method: 'get',
-          url: source,
-          responseType: 'stream',
-        })
-        response.data.pipe(createWriteStream(target))
-      }),
-    )
+          console.log(`fetching ${role} ${imgType}`)
+          const response = await axios({
+            method: 'get',
+            url: source,
+            responseType: 'stream',
+          })
+          response.data.pipe(createWriteStream(target))
+        }),
+      )
+    }
   }
 }
 
