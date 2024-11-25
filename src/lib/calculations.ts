@@ -1,5 +1,5 @@
-import { styles } from './data'
-import type { Style, Skill, NormalPart, SkillPartParameters, Multipliers } from './types'
+import { accessories, masterSkills, styles } from './data'
+import type { Style, Skill, NormalPart, SkillPartParameters, Multipliers, Part, Element } from './types'
 import { translateType, segip } from './utils'
 
 const ATTACK_TYPES = [
@@ -12,18 +12,29 @@ const ATTACK_TYPES = [
   'FixedHpDamageRateAttack',
 ]
 
+export function styleCanUseSkills(style: Style): Skill[] {
+  const chara = style.chara_label
+  return styles
+    .filter((st) => st.chara_label === chara)
+    .flatMap(({ generalize, skills, label }) =>
+      skills.filter(
+        (sk) =>
+          label === style.label ||
+          ((sk.is_restricted === 0 || generalize) &&
+            sk.name !== '通常攻撃' &&
+            sk.name !== '追撃' &&
+            sk.name !== '指揮行動'),
+      ),
+    )
+    .concat(masterSkills.find((ms) => ms.chara_label === chara)?.skill ?? [])
+    .concat(accessories.flatMap((acc) => acc.skill))
+}
+
 export function skillsFromTeam<T>(team: { params: T; style: Style }[]): (Skill & { ownerParams: T })[] {
   return team
     .filter((p) => p)
     .flatMap((pl) => {
-      const currentStyle = pl.style.label
-      const currentChara = pl.style.chara_label
-      const sameCharaStyles = styles.filter((s) => s.chara_label === currentChara)
-      return sameCharaStyles.flatMap(({ generalize, skills, label }) => {
-        return skills.flatMap((s) =>
-          s.is_restricted === 0 || generalize || label == currentStyle ? [{ ...s, ownerParams: pl.params }] : [],
-        )
-      })
+      return styleCanUseSkills(pl.style).map((sk) => ({ ...sk, ownerParams: pl.params }))
     })
 }
 

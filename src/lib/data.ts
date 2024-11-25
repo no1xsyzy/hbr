@@ -1,10 +1,23 @@
-import type { Style, Skill, Character, Battle, ScoreAttack, Translation, SimpleTranslate } from './types'
+import type {
+  Style,
+  Skill,
+  Character,
+  Battle,
+  ScoreAttack,
+  Translation,
+  SimpleTranslate,
+  MasterSkill,
+  Accessory,
+} from './types'
 
 export const styles = (await import('../../data_hbr/styles.json')).default as Style[]
 export const skills = (await import('../../data_hbr/skills.json')).default as Skill[]
 export const characters = (await import('../../data_hbr/characters.json')).default as Character[]
 export const battles = (await import('../../data_hbr/battles.json')).default as Battle[]
 export const score_attack = (await import('../../data_hbr/score_attack.json')).default as ScoreAttack[]
+export const masterSkills = (await import('../../data_hbr/masterSkills.json')).default as unknown as MasterSkill[]
+export const accessories = (await import('../../data_hbr/accessories.json')).default as Accessory[]
+
 export const translation = (await import('../../data_gen/translation.json')).default as Translation
 
 import databili from './databili.toml'
