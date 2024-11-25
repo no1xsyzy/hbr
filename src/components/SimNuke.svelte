@@ -560,9 +560,9 @@
       enemies = [...es, null, null].slice(0, 3)
     }}
   />
-  <Enemy enemy={enemies[2]} chosen={focusAt == 2} onclick={() => (focusAt = 2)} />
-  <Enemy enemy={enemies[0]} chosen={focusAt == 0} onclick={() => (focusAt = 0)} />
-  <Enemy enemy={enemies[1]} chosen={focusAt == 1} onclick={() => (focusAt = 1)} />
+  <Enemy enemy={enemies[2]} chosen={focusAt === 2} onclick={() => (focusAt = 2)} />
+  <Enemy enemy={enemies[0]} chosen={focusAt === 0} onclick={() => (focusAt = 0)} />
+  <Enemy enemy={enemies[1]} chosen={focusAt === 1} onclick={() => (focusAt = 1)} />
 </div>
 
 <div class="damagegrid">

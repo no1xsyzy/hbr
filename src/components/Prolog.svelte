@@ -204,7 +204,7 @@
   <textarea
     bind:value={query}
     onkeydown={(e) => {
-      if (e.keyCode == 13 && e.ctrlKey) ddd()
+      if (e.keyCode === 13 && e.ctrlKey) ddd()
     }}
     spellcheck="false"
   ></textarea>
@@ -212,7 +212,7 @@
   <textarea
     bind:value={cols}
     onkeydown={(e) => {
-      if (e.keyCode == 13 && e.ctrlKey) ddd()
+      if (e.keyCode === 13 && e.ctrlKey) ddd()
     }}
     spellcheck="false"
   ></textarea>

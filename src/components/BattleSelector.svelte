@@ -284,7 +284,7 @@
       {/each}
     </select>
   </div>
-  {#if sel?.type == 'score_attack'}
+  {#if sel?.type === 'score_attack'}
     难度：<input type="number" bind:value={difficulty} />
   {/if}
   <button
