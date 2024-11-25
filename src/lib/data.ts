@@ -37,3 +37,7 @@ export const { bACNames, bCCNames, bScoreAttacks, bTopped, bBattleNames, bInstal
     maintenance: { from: Date; till: Date; content: string[] }[]
   }
 }
+
+export const bInstalledStyles = Object.keys(bInstall)
+  .filter((k) => new Date(k) < new Date())
+  .flatMap((k) => bInstall[k])
