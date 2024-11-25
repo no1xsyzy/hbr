@@ -1,3 +1,6 @@
+/**
+ * @var {[string, string, (string | number)[]][]} CHECKS
+ * */
 const CHECKS = [
   ['SkillList', 'data_hbr/skills.json', []],
   ['StyleList', 'data_hbr/styles.json', []],
