@@ -463,6 +463,12 @@ export interface Skill {
   role?: string
 }
 
+export interface AbilityTree {
+  label: string
+  name: string
+  ability_list: Ability[]
+}
+
 export interface Style {
   id: number
   label: string
@@ -484,6 +490,7 @@ export interface Style {
       bonus: (Passive | Ability)[]
     }[]
   }
+  ability_tree: AbilityTree[]
   in_date: string
 }
 
