@@ -33,57 +33,58 @@
     border: 4px solid white;
   }
   span.neo_symbol {
-    --color-a: white;
-    --color-b: rgb(150, 150, 150);
+    --color-front: white;
+    --color-back: rgb(150, 150, 150);
     display: inline-block;
-    width: calc(var(--size) * 2);
-    height: calc(var(--size) * 2);
+    width: var(--size);
+    height: var(--size);
     font-weight: 400;
-    font-family: '方正兰亭圆_GBK_准';
+    font-family: '方正兰亭圆_GBK_准', sans-serif;
+    font-size: calc(var(--size) / 2);
     aspect-ratio: 1;
     text-align: center;
-    line-height: calc(var(--size) * 2);
-    border-width: calc(var(--size) / 8);
+    line-height: var(--size);
+    border-width: calc(var(--size) / 16);
     border-style: solid;
-    color: var(--color-a);
-    border-color: var(--color-a);
-    background-color: var(--color-b);
+    color: var(--color-front);
+    border-color: var(--color-front);
+    background-color: var(--color-back);
     border-radius: var(--size);
   }
   .neo_symbol.c-光 {
-    --color-a: black;
-    --color-b: white;
+    --color-front: black;
+    --color-back: white;
   }
   .neo_symbol.c-冰 {
-    --color-a: white;
-    --color-b: rgb(79, 87, 159);
+    --color-front: white;
+    --color-back: rgb(79, 87, 159);
   }
   .neo_symbol.c-打 {
-    --color-a: white;
-    --color-b: rgb(71, 122, 55);
+    --color-front: white;
+    --color-back: rgb(71, 122, 55);
   }
   .neo_symbol.c-斩 {
-    --color-a: white;
-    --color-b: rgb(143, 79, 159);
+    --color-front: white;
+    --color-back: rgb(143, 79, 159);
   }
   .neo_symbol.c-无 {
-    --color-a: white;
-    --color-b: rgb(150, 150, 150);
+    --color-front: white;
+    --color-back: rgb(150, 150, 150);
   }
   .neo_symbol.c-暗 {
-    --color-a: white;
-    --color-b: rgb(94, 94, 94);
+    --color-front: white;
+    --color-back: rgb(94, 94, 94);
   }
   .neo_symbol.c-火 {
-    --color-a: white;
-    --color-b: rgb(159, 79, 79);
+    --color-front: white;
+    --color-back: rgb(159, 79, 79);
   }
   .neo_symbol.c-突 {
-    --color-a: white;
-    --color-b: rgb(190, 122, 50);
+    --color-front: white;
+    --color-back: rgb(190, 122, 50);
   }
   .neo_symbol.c-雷 {
-    --color-a: white;
-    --color-b: rgb(134, 119, 51);
+    --color-front: white;
+    --color-back: rgb(134, 119, 51);
   }
 </style>
