@@ -487,6 +487,8 @@ export interface Style {
     stat_up_per_level: number
     bonus_per_level: {
       step: number
+      piece_num: number
+      level_cap: number
       bonus: (Passive | Ability)[]
     }[]
   }
