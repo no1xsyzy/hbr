@@ -634,6 +634,25 @@ export type ScoreAttackRule =
   | ScoreAttackRuleMaxHpRate
   | ScoreAttackRuleSkillPart
 
+export interface ScoreAttackBattle {
+  /** difficulty */ d: number
+  /** enemy labels */ b: string[]
+  bn: ({
+    /** name */ n: string
+    /** break rate */ d: [number, number]
+    /** resist */ r: Resist[]
+  } | null)[]
+  /** line for border */ rbl: number[]
+  /** line for dp */ dl: number[]
+  /** line for hp */ hl: number[]
+  /** line for attack rate */ al: number[]
+  /** damage bonus cap */ db: number
+  /** difficulty score */ ds: number
+  /** no break bonus */ nbb: number
+  /** max turn bonus, only if score_calc.calc_ver == 0 */ mtb: number
+  /** turn limit */ tl: number
+}
+
 export interface ScoreAttack {
   label: string
   desc: string
@@ -645,24 +664,7 @@ export interface ScoreAttack {
     /** 最大回合分加成（最末回合取到） */ max_tr: number
     /** 伤害分系数 */ tmdc: number
   }
-  battles: {
-    /** difficulty */ d: number
-    /** enemy labels */ b: string[]
-    bn: ({
-      /** name */ n: string
-      /** break rate */ d: [number, number]
-      /** resist */ r: Resist[]
-    } | null)[]
-    /** line for border */ rbl: number[]
-    /** line for dp */ dl: number[]
-    /** line for hp */ hl: number[]
-    /** line for attack rate */ al: number[]
-    /** damage bonus cap */ db: number
-    /** difficulty score */ ds: number
-    /** no break bonus */ nbb: number
-    /** max turn bonus, only if score_calc.calc_ver == 0 */ mtb: number
-    /** turn limit */ tl: number
-  }[]
+  battles: ScoreAttackBattle[]
   missions: { desc: string; reward: unknown[] }[]
   highscore: { score: number; reward: unknown[] }[]
   totalscore: { score: number; reward: unknown[] }[]
