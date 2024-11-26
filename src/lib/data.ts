@@ -38,6 +38,13 @@ export const { bACNames, bCCNames, bScoreAttacks, bTopped, bBattleNames, bInstal
   }
 }
 
-export const bInstalledStyles = Object.keys(bInstall)
+export const bInstalledStyleLabels = Object.keys(bInstall)
   .filter((k) => new Date(k) < new Date())
   .flatMap((k) => bInstall[k])
+
+export const styleByLabel = Object.fromEntries(styles.map((st) => [st.label, st]))
+export const stylesByChara = Object.groupBy(styles, (st) => st.chara_label)
+
+const bInstalledStyleLabelsSet = new Set(bInstalledStyleLabels)
+
+export const bInstalledStyles = styles.filter((st) => bInstalledStyleLabelsSet.has(st.label))
