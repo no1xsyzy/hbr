@@ -5,6 +5,9 @@
   import Prolog from './Prolog.svelte'
   import EstimateBAcc from './EstimateBAcc.svelte'
   import Sql from './Sql.svelte'
+  import TeamOrchestration from './TeamOrchestration.svelte'
+  import BoxEditor from './BoxEditor.svelte'
+  import Config from './Config.svelte'
 
   const ROOT_STORE_KEY = 'ROOT_STORE_KEY'
 
@@ -75,10 +78,13 @@
   <!-- <div class="padding"></div> -->
   <div class="adders">
     <button class="adds" onclick={() => addPage('nuke')}>+计算一发核弹</button>
-    <button class="adds" onclick={() => addPage('odsp')}>+计算OD和SP</button>
+    <button class="adds" onclick={() => addPage('odsp')}>+计算OD和SP(WIP)</button>
     <button class="adds" onclick={() => addPage('prolog')}>+Prolog</button>
     <button class="adds" onclick={() => addPage('sql')}>+SQL</button>
     <button class="adds" onclick={() => addPage('esacc_bili')}>+预测B服实装速度</button>
+    <button class="adds" onclick={() => addPage('team_or')}>+编队顶伤计算器(WIP)</button>
+    <button class="adds" onclick={() => addPage('box_edit')}>+Box编辑(WIP)</button>
+    <button class="adds" onclick={() => addPage('config')}>+设置</button>
   </div>
 </nav>
 
@@ -104,6 +110,18 @@
   {:else if page.type === 'esacc_bili'}
     <main class:active>
       <EstimateBAcc storeKey={page.storeKey} {active} {setname} />
+    </main>
+  {:else if page.type === 'team_or'}
+    <main class:active>
+      <TeamOrchestration storeKey={page.storeKey} {active} {setname} />
+    </main>
+  {:else if page.type === 'box_edit'}
+    <main class:active>
+      <BoxEditor storeKey={page.storeKey} {active} {setname} />
+    </main>
+  {:else if page.type === 'config'}
+    <main class:active>
+      <Config storeKey={page.storeKey} {active} {setname} />
     </main>
   {:else}
     <main class:active>
