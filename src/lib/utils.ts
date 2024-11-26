@@ -1,44 +1,6 @@
 import { translate } from './translate'
-
-interface Style {
-  label: string
-  elements: string[]
-  type: string
-  skills: Skill[]
-  chara: string
-  name: string
-  tier: string
-  team: string
-}
-interface Skill {
-  parts: SkillPart[]
-}
-interface SkillPart {
-  skill_type: string
-  target_type: string
-  elements: string[]
-  strval: Skill[]
-}
-interface ScoreAttackBattle {
-  label: string
-  d: number // difficulty
-  db: number // damage cap
-  ds: number // difficulty score
-  nbb: number // no break bonus
-  mtb: number // max turn bonus
-  tl: number // turn limit
-}
-interface ScoreAttack {
-  score_calc: {
-    tmdc: number
-    calc_ver: number
-    btr: number
-    btcfr: number
-    min_tr: number
-    max_tr: number
-  }
-  battles: ScoreAttackBattle[]
-}
+import { bInstalledStyles, styles } from './data'
+import type { Part, Skill, Style, ScoreAttack, ScoreAttackBattle, Element } from './types'
 
 export function segip(points: [number, number][], x: number) {
   if (points.length === 0) {
@@ -113,6 +75,7 @@ export function mat(param_mass: ParamOptional, param_val: ParamOptional) {
 }
 
 type BattleAttrGetter = (battle: ScoreAttackBattle) => number
+
 export function scoreAttackGetLine(scoreAttack: ScoreAttack, f: BattleAttrGetter): [number, number][] {
   return scoreAttack.battles.map((battle) => [battle.d, f(battle)])
 }
@@ -177,9 +140,13 @@ function damageScore(tmdc: number, damageDealt: number, damageCap: number) {
   return Math.trunc(tmdc * damageCap * m(damageDealt / damageCap))
 }
 
-function skillAnyParts(skill: Skill, partP: (part: SkillPart) => boolean) {
+function skillAnyParts(skill: Skill, partP: (part: Part) => boolean) {
   for (const part of skill.parts) {
-    if (['SkillRandom', 'SkillCondition', 'SkillSwitch'].includes(part.skill_type)) {
+    if (
+      part.skill_type === 'SkillRandom' ||
+      part.skill_type === 'SkillCondition' ||
+      part.skill_type === 'SkillSwitch'
+    ) {
       for (const skill of part.strval) if (skillAnyParts(skill, partP)) return true
     } else {
       if (partP(part)) return true
@@ -188,7 +155,7 @@ function skillAnyParts(skill: Skill, partP: (part: SkillPart) => boolean) {
   return false
 }
 
-function styleAnyParts(style: Style, partP: (a: SkillPart) => boolean) {
+function styleAnyParts(style: Style, partP: (a: Part) => boolean) {
   for (const skill of style.skills) {
     if (skillAnyParts(skill, partP)) {
       return true
@@ -197,17 +164,17 @@ function styleAnyParts(style: Style, partP: (a: SkillPart) => boolean) {
   return false
 }
 
-function isPartElement(element: string) {
-  if (element == 'None') {
-    return (part: SkillPart) => part.elements.length === 0
+function isPartElement(element: Element) {
+  if (element == 'Nonelement') {
+    return (part: Part) => part.elements.length === 0
   } else {
-    return (part: SkillPart) => part.elements.includes(element)
+    return (part: Part) => part.elements.includes(element)
   }
 }
 
-const isAoe = (part: SkillPart) => part.skill_type === 'AttackSkill' && part.target_type === 'All'
+const isAoe = (part: Part) => part.skill_type === 'AttackSkill' && part.target_type === 'All'
 
-const isAoePartOfElement = (element: string) => (part: SkillPart) => isAoe(part) && isPartElement(element)(part)
+const isAoePartOfElement = (element: Element) => (part: Part) => isAoe(part) && isPartElement(element)(part)
 
 function arePrefixes(...strings: string[]) {
   for (let i = 0; i < strings.length - 1; i++) {
@@ -320,5 +287,15 @@ export function filterFromSearch(search: string): (style: Style, _: number, allS
       if (!filterOneCond(style, cond)) return false
     }
     return true
+  }
+}
+
+export function installedStyles(server: 'WFS' | 'BILI'): Style[] {
+  if (server === 'WFS') {
+    return styles
+  } else if (server === 'BILI') {
+    return bInstalledStyles
+  } else {
+    throw new Error(`unknown server ${server}`)
   }
 }
