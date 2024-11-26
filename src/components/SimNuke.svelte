@@ -4,7 +4,6 @@
   import { translateType, segip, mat } from '../lib/utils.ts'
   import { styles } from '../lib/data.ts'
   import { translate } from '../lib/translate.ts'
-  import { LocalStorage } from '../lib/store.ts'
 
   import BattleSelector from './BattleSelector.svelte'
   import Enemy from './Enemy.svelte'
