@@ -11,6 +11,17 @@
 
   const ROOT_STORE_KEY = 'ROOT_STORE_KEY'
 
+  const AVAILABLE_PAGES = {
+    'nuke': ['计算一发核弹', SimNuke],
+    'odsp': ['计算OD和SP(WIP)', SimODSP],
+    'prolog': ['Prolog', Prolog],
+    'sql': ['SQL', Sql],
+    'esacc_bili': ['预测B服实装速度', EstimateBAcc],
+    'team_or': ['编队顶伤计算器(WIP)', TeamOrchestration],
+    'box_edit': ['Box编辑', BoxEditor],
+    'config': ['设置', Config],
+  }
+
   let pages = $state([])
   let currentPageKey = $state(null)
   let pageCount = 0
@@ -77,51 +88,19 @@
   {/each}
   <!-- <div class="padding"></div> -->
   <div class="adders">
-    <button class="adds" onclick={() => addPage('nuke')}>+计算一发核弹</button>
-    <button class="adds" onclick={() => addPage('odsp')}>+计算OD和SP(WIP)</button>
-    <button class="adds" onclick={() => addPage('prolog')}>+Prolog</button>
-    <button class="adds" onclick={() => addPage('sql')}>+SQL</button>
-    <button class="adds" onclick={() => addPage('esacc_bili')}>+预测B服实装速度</button>
-    <button class="adds" onclick={() => addPage('team_or')}>+编队顶伤计算器(WIP)</button>
-    <button class="adds" onclick={() => addPage('box_edit')}>+Box编辑(WIP)</button>
-    <button class="adds" onclick={() => addPage('config')}>+设置</button>
+    {#each Object.keys(AVAILABLE_PAGES) as p}
+      <button class="adds" onclick={()=>addPage(p)}>+{AVAILABLE_PAGES[p][0]}</button>
+    {/each}
   </div>
 </nav>
 
 {#each pages as page, i (page.key)}
   {@const active = currentPageKey === page.key}
   {@const setname = (name) => (page.name = name)}
-  {#if page.type === 'nuke'}
+  {@const [_, Component] = AVAILABLE_PAGES[page.type] ?? [null, null]}
+  {#if Component}
     <main class:active>
-      <SimNuke storeKey={page.storeKey} {active} {setname} />
-    </main>
-  {:else if page.type === 'odsp'}
-    <main class:active>
-      <SimODSP storeKey={page.storeKey} {active} {setname} />
-    </main>
-  {:else if page.type === 'prolog'}
-    <main class:active>
-      <Prolog storeKey={page.storeKey} {active} {setname} />
-    </main>
-  {:else if page.type === 'sql'}
-    <main class:active>
-      <Sql storeKey={page.storeKey} {active} {setname} />
-    </main>
-  {:else if page.type === 'esacc_bili'}
-    <main class:active>
-      <EstimateBAcc storeKey={page.storeKey} {active} {setname} />
-    </main>
-  {:else if page.type === 'team_or'}
-    <main class:active>
-      <TeamOrchestration storeKey={page.storeKey} {active} {setname} />
-    </main>
-  {:else if page.type === 'box_edit'}
-    <main class:active>
-      <BoxEditor storeKey={page.storeKey} {active} {setname} />
-    </main>
-  {:else if page.type === 'config'}
-    <main class:active>
-      <Config storeKey={page.storeKey} {active} {setname} />
+      <Component storeKey={page.storeKey} {active} {setname} />
     </main>
   {:else}
     <main class:active>
