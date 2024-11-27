@@ -2,7 +2,7 @@
   import { onDestroy } from 'svelte'
   import { DEFAULT_INIT, doQuery, presets } from '../lib/prolog.ts'
   import pl from '../lib/tau-prolog.ts'
-  import { styles, skills, characters } from '../lib/data.ts'
+  import { styles, skills, characters, styleByLabel } from '../lib/data.ts'
   import { translate } from '../lib/translate.ts'
   import shellParse from 'shell-quote/parse'
 
@@ -91,7 +91,7 @@
     }),
   )
 
-  const iconFromStyleLabel = (label) => styles.find((st) => st.label === label)?.image ?? ''
+  const iconFromStyleLabel = (label) => styleByLabel[label]?.image ?? ''
   const iconFromSkillLabel = (label) => skills.find((sk) => sk.label === label)?.image ?? ''
   const iconFromCharaLabel = (label) => characters.find((c) => c.label === label)?.image ?? ''
 

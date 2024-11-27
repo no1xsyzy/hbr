@@ -7,7 +7,7 @@
   import MaybeNegSP from './MaybeNegSP.svelte'
   import StyleIcon from './StyleIcon.svelte'
 
-  import { styles } from '../lib/data.ts'
+  import { styleByLabel, styles } from '../lib/data.ts'
   import { translate } from '../lib/translate.ts'
   let { storeKey } = $props()
 
@@ -231,7 +231,7 @@
   ])
 
   const charaSkills = (styleLabel) => {
-    const style = styles.find((s) => s.label === styleLabel)
+    const style = styleByLabel[styleLabel]
     const chara = style.chara_label
     return styles.flatMap(({ generalize, skills, label, chara_label }) =>
       label === styleLabel || generalize

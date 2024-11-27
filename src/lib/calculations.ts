@@ -1,4 +1,4 @@
-import { accessories, masterSkills, styles } from './data'
+import { accessories, masterSkills, styleByLabel, styles } from './data'
 import type { Element, Multipliers, NormalPart, Part, Resist, Skill, SkillPartParameters, Style, SType } from './types'
 import { translateType, segip } from './utils'
 
@@ -411,7 +411,7 @@ export function estimatePower(
   if (teamRest.length > 5) {
     throw new Error(`too huge team ${JSON.stringify(teamRest)}`)
   }
-  const style = styles.find((x) => x.label === ejector[0])
+  const style = styleByLabel[ejector[0]]
   if (style === undefined) {
     throw new Error(`${ejector[0]} is not a valid style`)
   }
@@ -424,7 +424,7 @@ export function randomChoice<T>(lst: T[]): T {
 }
 
 export function charaFromStyle(style: string) {
-  const found = styles.find((st) => st.label === style)
+  const found = styleByLabel[style]
   if (found === undefined) {
     throw new Error(`${style} is not a valid style`)
   }
@@ -484,7 +484,7 @@ export function genTeamGivenAttack(
 export function genTeam(border: number, weakMult: WeakMultiplier, box: StyleLB[], ex_only: boolean): GenTeam[] {
   let result: GenTeam[] = []
   for (const ejector of box) {
-    const style = styles.find((st) => st.label === ejector[0])
+    const style = styleByLabel[ejector[0]]
     if (style === undefined) {
       throw new Error(`${ejector[0]} is not a valid style`)
     }

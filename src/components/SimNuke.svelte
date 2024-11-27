@@ -2,7 +2,7 @@
   import { onDestroy } from 'svelte'
 
   import { translateType, segip, mat } from '../lib/utils.ts'
-  import { styles } from '../lib/data.ts'
+  import { styleByLabel, styles } from '../lib/data.ts'
   import { translate } from '../lib/translate.ts'
 
   import BattleSelector from './BattleSelector.svelte'
@@ -147,7 +147,7 @@
   })
 
   let apparentTeam = $derived(
-    team.flatMap((pl, i) => (pl ? [{ style: styles.find((s) => s.label === pl), params: params[i] }] : [])),
+    team.flatMap((pl, i) => (pl ? [{ style: styleByLabel[pl], params: params[i] }] : [])),
   )
 
   let allSkills = $derived(
@@ -503,13 +503,9 @@
   let hits = $derived(
     nuke?.hits.concat(
       makeX(allFunnels, funnels)
-        .map(x => (console.log('AA', x), x))
         .sort((x, y) => y.truePower - x.truePower)
-        .map(x => (console.log('BB', x), x))
         .flatMap(({ stack, ...r }) => Array(stack).fill(r))
-        .map(x => (console.log('CC', x), x))
         .slice(0, 2)
-        .map(x => (console.log('DD', x), x))
         .flatMap((f) => Array(Math.max(...f.power)).fill(f.value[0])),
     ) ?? [],
   )

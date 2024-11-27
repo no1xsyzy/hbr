@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as echarts from 'echarts'
 
-  import { styles, bInstall } from '../lib/data.ts'
+  import { styles, bInstall, styleByLabel } from '../lib/data.ts'
   import type { Style } from '../lib/types.ts'
   import { translate } from '../lib/translate.ts'
 
@@ -23,7 +23,7 @@
     let acc: number = 0
     for (const [date, sls] of pairsDateStyle) {
       acc = acc + sls.length
-      const the_styles: Style[] = sls.map((sl) => styles.find((st) => st.label == sl))
+      const the_styles: Style[] = sls.map((sl) => styleByLabel[sl])
       source.push({
         date,
         num: sls.length,
