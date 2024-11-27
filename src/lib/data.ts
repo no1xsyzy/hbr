@@ -43,6 +43,7 @@ export const bInstalledStyleLabels = Object.keys(bInstall)
   .flatMap((k) => bInstall[k])
 
 export const styleByLabel = Object.fromEntries(styles.map((st) => [st.label, st]))
+export const styleById = Object.fromEntries(styles.map((st) => [st.id, st]))
 export const stylesByChara = Object.groupBy(styles, (st) => st.chara_label)
 
 const bInstalledStyleLabelsSet = new Set(bInstalledStyleLabels)
