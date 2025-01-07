@@ -268,6 +268,8 @@
             return ['时之修炼场 51-60', label] // 14300
           case 9:
             return ['时之修炼场 61-70', label] // 14800
+          case 10:
+            return ['时之修炼场 71-80', label] // 15300
         }
         return [label, '*别名还没处理好*，但它应该是时之修炼场的一部分']
     }
