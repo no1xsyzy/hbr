@@ -1,4 +1,4 @@
-import { translation } from '../lib/data'
+import { translation } from './data'
 
 type MaybeHasLabel = { translateLabel?: string; label?: string }
 
