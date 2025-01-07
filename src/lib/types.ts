@@ -127,7 +127,9 @@ export type SkillTypeIndentifier =
   | 'DefenseUp'
   | 'DefenseUpFromEnemyGroup'
   | 'DefenseUpPerToken'
+  | 'Dodge'
   | 'DoubleActionExtraSkill'
+  | 'Diva'
   | 'EternalOath'
   | 'FightingSpirit'
   | 'FixedHpDamageRate'
@@ -173,6 +175,7 @@ export type SkillTypeIndentifier =
   | 'RiceFieldZone'
   | 'SelfDamage'
   | 'ShadowClone'
+  | 'Shredding'
   | 'SkillLimitCountUp'
   | 'SpecifySp'
   | 'StunRandom'
@@ -267,7 +270,9 @@ export type DefenseDown = SkillPart0<'DefenseDown'>
 export type DefenseUp = SkillPart0<'DefenseUp'>
 export type DefenseUpFromEnemyGroup = SkillPartWithStrvalEnemyTag<'DefenseUpFromEnemyGroup'>
 export type DefenseUpPerToken = SkillPart0<'DefenseUpPerToken'>
+export type Dodge = SkillPart0<'Dodge'>
 export type DoubleActionExtraSkill = SkillPart0<'DoubleActionExtraSkill'>
+export type Diva = SkillPart0<'Diva'>
 export type EternalOath = SkillPart0<'EternalOath'>
 export type FightingSpirit = SkillPart0<'FightingSpirit'>
 export type FixedHpDamageRate = SkillPart0<'FixedHpDamageRate'>
@@ -313,6 +318,7 @@ export type ReviveDpRate = SkillPart0<'ReviveDpRate'>
 export type RiceFieldZone = SkillPart0<'RiceFieldZone'>
 export type SelfDamage = SkillPart0<'SelfDamage'>
 export type ShadowClone = SkillPart0<'ShadowClone'>
+export type Shredding = SkillPart0<'Shredding'>
 export type SkillLimitCountUp = SkillPart0<'SkillLimitCountUp'>
 export type SpecifySp = SkillPart0<'SpecifySp'>
 export type StunRandom = SkillPart0<'StunRandom'>
@@ -366,7 +372,9 @@ export type NormalPart =
   | DefenseUp
   | DefenseUpFromEnemyGroup
   | DefenseUpPerToken
+  | Dodge
   | DoubleActionExtraSkill
+  | Diva
   | EternalOath
   | FightingSpirit
   | FixedHpDamageRate
@@ -412,6 +420,7 @@ export type NormalPart =
   | RiceFieldZone
   | SelfDamage
   | ShadowClone
+  | Shredding
   | SkillLimitCountUp
   | SpecifySp
   | StunRandom
