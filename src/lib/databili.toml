@@ -98,119 +98,10 @@ Hard_Renewal_MC04_12_UltimateHand3rd = '新版异时层 四章上 覆地之手 �
 # Hard_MC04B_14_SkullFeatherTail = '异时层 SkullFeatherTail'
 
 # 国服时间线（删除过期条目）
-[[bEvent.redeem]]
-from = "now"
-till = 2024-12-04T12:59:00+08:00
-code = "HBRFREE20241120"
-content = "晶石×100、体力石×10"
-dynamic = "https://www.bilibili.com/opus/1000244634261127169"
-
-[[bEvent.redeem]]
-from = "now"
-till = 2024-11-30T23:59:00+08:00
-code = "PX1A92V5EVN"
-content = "晶石×100、体力石×10"
-dynamic = "https://www.bilibili.com/opus/1000244634261127169"
-
-[[bEvent.gatcha]]
-from = 2024-11-20T13:00:00+08:00
-till = 2024-12-04T12:59:00+08:00
-title = '必得婚纱新衣装SS！感恩回馈特别纪念扭蛋'
-tags = ['必得SS', '登录即得']
-styles = ['IcOhshima04', 'MSatsuki05']
-dynamic = "https://www.bilibili.com/opus/1000244634261127169"
-
-[[bEvent.gatcha]]
-from = 2024-11-20T13:00:00+08:00
-till = 2024-12-17T12:59:00+08:00
-title = "SS佐月麻里/大岛一千子登场！精选白金扭蛋"
-styles = ['IcOhshima04', 'MSatsuki05']
-tags = ['奖励量表']
-dynamic = "https://www.bilibili.com/opus/1000260083237519379"
-
-[[bEvent.gatcha]]
-from = 2024-11-20T13:00:00+08:00
-till = 2024-12-17T12:59:00+08:00
-title = "初冬纪念Step Up扭蛋"
-styles = [
-  'MSatsuki05',
-  'IcOhshima04',
-  'YIzumi05',
-  'MuOhshima03',
-  'LShanhua03',
-  'MdAngelis03',
-  'AKanzaki04',
-  'MSatsuki04',
-  'CSugahara04',
-  'FMikoto03',
-]
-tags = ['必得SS', '付费Step']
-dynamic = "https://www.bilibili.com/opus/1000260083237519379"
-
-[[bEvent.gatcha]]
-from = 2024-11-20T13:00:00+08:00
-till = 2024-12-17T12:59:00+08:00
-title = '初冬纪念必得SS风格登录奖励'
-tags = ['必得SS', '累登即得', '小池']
-dynamic = "https://www.bilibili.com/opus/1000352858830274564"
-
-[[bEvent.x3]]
-from = 2024-11-20T13:00:00+08:00
-till = 2024-12-04T12:59:00+08:00
-event = 5
-dynamic = "https://www.bilibili.com/opus/1000631168448593928"
-
-[[bEvent.gatcha]]
-from = 2024-11-20T13:00:00+08:00
-till = 2024-12-17T12:59:00+08:00
-title = "最多免费20次！初冬纪念登录扭蛋"
-tags = ['每日一抽']
-dynamic = "https://www.bilibili.com/opus/1000723939729604641"
-
-[[bEvent.scoreattack]]
-from = 2024-11-20T13:00:00+08:00
-till = 2024-12-04T12:59:00+08:00
-title = "高分挑战#10 难缠的遭遇战"
-dynamic = "https://www.bilibili.com/opus/1001002253594656836"
-
-[[bEvent.x3]]
-from = 2024-11-27T04:00:00+08:00
-till = 2024-12-11T03:59:00+08:00
-event = 11
-
-[[bEvent.hard]]
-from = 2024-11-29T11:00:00+08:00
-till = 2024-12-02T10:59:00+08:00
-title = "异时层出现！第三章 Day21 覆地之手"
-
-[[bEvent.theme]]
-from = 2024-12-04T13:00:00+08:00
-till = 2024-12-30T12:59:00+08:00
-event = 19
-
-[[bEvent.x3]]
-from = 2024-12-17T13:00:00+08:00
-till = 2024-12-30T12:59:00+08:00
-event = 7
-
 [[bEvent.x3]]
 from = 2024-12-24T04:00:00+08:00
 till = 2025-01-17T03:59:00+08:00
 event = 12
-
-[[bEvent.gatcha]]
-from = 2024-12-04T13:00:00+08:00
-till = 2024-12-30T12:59:00+08:00
-title = ""
-styles = ['TKunimi07', 'YShirakawa06']
-tags = ['初次登场']
-
-[[bEvent.gatcha]]
-from = 2024-12-04T13:00:00+08:00
-till = 2024-12-30T12:59:00+08:00
-title = ""
-styles = ['INatsume04', 'YIzumi07']
-tags = ['每日一抽', '初次登场']
 
 ## 模板 ##
 
@@ -413,7 +304,6 @@ tags = ['每日一抽', '初次登场']
   'FMikoto02',
 ]
 '2024-11-20 13:00:00+08:00' = ['IcOhshima04', 'MSatsuki05']
-# :: 时间已定未出 ::
 '2024-12-04 13:00:00+08:00' = [
   'TKunimi07',
   'YShirakawa06',
@@ -424,13 +314,20 @@ tags = ['每日一抽', '初次登场']
   'YIzumi06',
 ]
 '2024-12-17 13:00:00+08:00' = ['KAsakura05', 'TTojo05']
+'2024-12-30 13:00:00+08:00' = [
+  'MKiryu04',
+  'MYanagi04',
+  'CMatsuoka02',
+  'NiOhshima05',
+  'IrOhshima04',
+  'MuOhshima04',
+]
+# :: 时间已定未出 ::
+'2025-01-10 13:00:00+08:00' = ['AKanzaki05', 'LShanhua04', 'VBalakrishnan04',]
 # :: 具体时间未确定 ::
 # :: 乱序未实装 ::
-# 'MKiryu04', 'MYanagi04', 'CMatsuoka02',
 # :: 手册中可偷看 ::
 # :: 手册中不可偷看 ::
-# 'NiOhshima05', 'IrOhshima04', 'MuOhshima04',
-# 'AKanzaki05', 'LShanhua04', 'VBalakrishnan04',
 # 'MTsukishiro04', 'CSugahara05', 'HOgasawara05',
 # 'MdAngelis04', 'CSkopovskaya04',
 # 'MNikaido04', 'ADate04', 'AMizuhara04',
@@ -457,3 +354,8 @@ tags = ['每日一抽', '初次登场']
 # 'CReaper05', 'CSkopovskaya06',
 # 'YIzumi09',
 # 'EAoi06', 'IMinase05', 'SMinase06',
+# 'EAoi07', 'MKurosawa05', 'SHiguchi06',
+# 'AMizuhara06', 'IIshii05', 'RMurohushi06',
+# 'SHanamura04', 'FMikoto04',
+# 'RKayamori09',
+# 'CathyA02', 'CathyB03', 'CathyC03',
