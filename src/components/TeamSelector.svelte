@@ -2,9 +2,14 @@
 <script lang="ts">
   import LoadSaveTeam from './LoadSaveTeam.svelte'
   import Player from './Player.svelte'
-  let { team = $bindable([null, null, null, null, null, null]), param = null } = $props()
+  import type { Snippet } from 'svelte'
 
-  const param_render = $derived(param)
+  interface Props {
+    team: [string | null, string | null, string | null, string | null, string | null, string | null]
+    param: Snippet<[{ pos: number, style: string }]>
+  }
+
+  let { team = $bindable([null, null, null, null, null, null]), param: param_render }: Props = $props()
 </script>
 
 <div class="playergrid">

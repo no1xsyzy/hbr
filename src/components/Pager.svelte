@@ -61,32 +61,32 @@
     pages.push(newPage)
     currentPageKey = newPage.key
   }
+
+
+  function removePage(page, i, current) {
+    pages.splice(i, 1)
+    const storeKey = page.storeKey
+    tick().then(() => { // defer this
+      localStorage.removeItem(storeKey)
+    })
+    if (current) {
+      if (pages.length === 0) currentPageKey = null
+      else if (pages.length === i) currentPageKey = pages.at(-1).key
+      else currentPageKey = pages[i].key
+    }
+  }
+
 </script>
 
 <nav>
   {#each pages as page, i}
     {@const current = currentPageKey === page.key}
-    <div class="simsel" class:current>
-      <button class="sel" onclick={(e) => (currentPageKey = page.key)}>{page.name}</button>
-      <button
-        class="del"
-        onclick={() => {
-          pages.splice(i, 1)
-          const storeKey = page.storeKey
-          tick().then(() => {
-            localStorage.removeItem(storeKey)
-          })
-          if (current) {
-            if (pages.length === 0) currentPageKey = null
-            else if (pages.length === i) currentPageKey = pages.at(-1).key
-            else currentPageKey = pages[i].key
-          }
-        }}
-      >x
-      </button>
-    </div>
+    <label class="page-sel" class:current>
+      <input type="radio" style:display="none" bind:group={currentPageKey} value={page.key} />
+      {page.name}
+      <button class="del" onclick={() => removePage(page, i, current)}>x</button>
+    </label>
   {/each}
-  <!-- <div class="padding"></div> -->
   <div class="adders">
     {#each Object.keys(AVAILABLE_PAGES) as p}
       <button class="adds" onclick={()=>addPage(p)}>+{AVAILABLE_PAGES[p][0]}</button>
@@ -141,41 +141,39 @@
     flex-wrap: wrap;
     gap: 0;
 
-    & .adders {
-      margin-left: auto;
-    }
-
-    & .simsel {
+    & .page-sel {
       background-color: grey;
       border: none;
       height: 40px;
-      white-space: collapse balance;
+      white-space: collapse;
+      user-select: none;
+      padding-left: 10px;
+
+      &.current {
+        background-color: white;
+      }
 
       &:hover {
         background-color: lightgrey;
       }
 
-      & button {
+      & button.del {
         height: 100%;
         background-color: transparent;
         border: none;
 
-        &.sel {
-          padding: 0 10px;
-        }
-
-        &.del:hover {
+        &:hover {
           color: red;
         }
       }
+    }
 
-      &.current {
-        background-color: white;
+    & .adders {
+      margin-left: auto;
+
+      & .adds {
+        height: 40px;
       }
     }
-  }
-
-  nav .adds {
-    height: 40px;
   }
 </style>

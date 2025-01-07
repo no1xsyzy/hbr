@@ -19,7 +19,7 @@
   let alt = $derived(foundStyle ? (translates ? translate(foundStyle) : foundStyle).name : style)
 </script>
 
-<div class="root" style={'--size: ' + size}>
+<div class="root" style:--size={size}>
   <img {src} {alt} />
   {#if detailed}
     <div class="detail">

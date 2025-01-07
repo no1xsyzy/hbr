@@ -16,7 +16,7 @@
 
   const simpleFixed = (num, pass) => num.toFixed(pass).replace(/\.?0+$/, '')
 
-  let team = $state([null, null, null, null, null, null])
+  let team: [string | null, string | null, string | null, string | null, string | null, string | null] = $state([null, null, null, null, null, null])
   let params = $state(
     Array(6)
       .fill(0)

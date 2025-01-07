@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { type Snippet } from 'svelte'
   import { translateType, filterFromSearch } from '../lib/utils.ts'
   import { styles, translation } from '../lib/data.ts'
   import { translate, translateLabel } from '../lib/translate.ts'
@@ -7,18 +8,18 @@
 
   const HBR_QUEST_IMG_PREFIX = `https://www.hbr.quest/hbr`
 
-  export interface Player {
+  interface Player<Params> {
     style: string
-    param: any
+    params: Params
   }
 
   interface Props {
-    player: Player
-    param?: import('svelte').Snippet<[any]>
+    player: string
+    param?: Snippet<[{ style: string }]>
     setStyle: (style: string | null) => void
   }
 
-  let { player = $bindable(), param, setStyle }: Props = $props()
+  let { player = $bindable(), param = null, setStyle }: Props = $props()
 
   let dialog
   let search = $state('')
@@ -78,6 +79,7 @@
     height: 100%;
     border: none;
   }
+
   .player {
     background-color: pink;
     border-radius: 13px;
@@ -85,6 +87,7 @@
     max-width: 180px;
     height: 100%;
   }
+
   .flex {
     display: flex;
     flex-direction: row;
@@ -93,6 +96,7 @@
     align-items: flex-start;
     align-content: flex-start;
   }
+
   dialog {
     width: 800px;
     height: 600px;
@@ -100,17 +104,20 @@
     border: 0;
     overflow: hidden;
   }
+
   dialog > input.search {
     padding: 5px;
     height: 20px;
     border: none;
     border-radius: 0;
   }
+
   dialog > button.cancel {
     height: 34px;
     padding: 5px;
     border: none;
   }
+
   dialog .scroll {
     width: 800px;
     height: 600px;
